@@ -70,12 +70,13 @@ function love.load()
         ['hurt'] = love.audio.newSource('sfx/hurt.wav', 'static'),
         ['score'] = love.audio.newSource('sfx/score.wav', 'static'),
         -- https://freesound.org/people/xsgianni/sounds/388079/
-        ['music'] = love.audio.newSource('sfx/marios_way.mp3', 'static')
+        ['music'] = love.audio.newSource('sfx/marios_way.mp3', 'static'),
+        ['pause'] = love.audio.newSource('sfx/pause.wav', 'static')
     }
 
     --kick off music
-    --sounds['music']:setLooping(true)
-    --sounds['music']:play()
+    sounds['music']:setLooping(true)
+    sounds['music']:play()
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,

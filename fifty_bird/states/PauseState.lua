@@ -10,10 +10,15 @@ function PauseState:init()
     -- nothing
 end
 function PauseState:enter(params)
+    --pause the music
+    sounds['music']:pause();
     self.score = params.score
 end
 function PauseState:update(dt)
     if love.keyboard.was_pressed("enter") or love.keyboard.was_pressed("p") then
+        sounds['pause']:play()
+        --you can't resume as it's set to loop. so we just set it to play again.
+        sounds['music']:play()
         gStateMachine:change('countdown')
     end
 end
