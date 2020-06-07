@@ -47,7 +47,7 @@ function PlayState:update(dt)
         -- reset timer
         self.timer = 0
 
-        self.wait_time = ((gCurrentDifficulty) and 0.9 or 1.25) + (math.random() * 1)
+        self.wait_time = ((gCurrentDifficulty) and 0.75 or 1.5) + (math.random() * 1)
     end
 
     -- for every pair of pipes..
