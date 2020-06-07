@@ -14,6 +14,7 @@ CountdownState = Class { __includes = BaseState }
 COUNTDOWN_TIME = 0.75
 
 function CountdownState:init()
+    gCurrentPlayTime = 0
     self.count = 3
     self.timer = 0
 end
@@ -38,5 +39,14 @@ end
 
 function CountdownState:render()
     love.graphics.setFont(huge_font)
-    love.graphics.printf(tostring(self.count), 0, 120, VIRTUAL_WIDTH, 'center')
+    local string_table = {}
+    if self.count == 3 then
+        table.insert(string_table, { 1, 0, 0 })
+    elseif self.count == 2 then
+        table.insert(string_table, { 1, 1, 0 })
+    elseif self.count == 1 then
+        table.insert(string_table, { 0, 1, 0 })
+    end
+    table.insert(string_table, tostring(self.count))
+    love.graphics.printf(string_table, 0, 120, VIRTUAL_WIDTH, 'center')
 end

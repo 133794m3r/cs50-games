@@ -51,21 +51,34 @@ function ScoreState:render()
     local modifier = (gCurrentDifficulty) and 2 or 1
 
     love.graphics.setFont(medium_font)
-    self.score = 10
-    if self.score <= self.tier_1 * modifier then
-        --show it as red text
-        love.graphics.print({ { 1, 0, 0 }, "\"You Tried!\"" }, VIRTUAL_WIDTH / 2 - 80, 160)
-        love.graphics.draw(self.award_0, VIRTUAL_WIDTH / 2 + 40, 150)
-
-    elseif self.score <= self.tier_2 * modifier then
-        --show it as yellow text
-        love.graphics.print({ { 1, 1, 0 }, "\"Carry on my Flapping son!\"" }, VIRTUAL_WIDTH / 2 - 180, 160)
-        love.graphics.draw(self.award_1, VIRTUAL_WIDTH / 2 + 40, 150)
-
-    elseif self.score >= self.tier_2 * modifier then
+    --self.score = 15
+    --[[
+        The if statement below changes what scores are required based upon the difficulty selected.
+        the difficulty is stored within gCurrentDifficulty. If it is true then they are playing on hardmode.
+        This causes all tier requirements to be doubled in terms of score required to get them.
+    ]]
+    --they got the highest tier.
+    if self.score >= self.tier_2 * modifier then
         --show it as green text
         love.graphics.print({ { 0, 1, 0 }, "\"Flapmaster!\"" }, VIRTUAL_WIDTH / 2 - 90, 160)
+        --then draw the award itself.
         love.graphics.draw(self.award_2, VIRTUAL_WIDTH / 2 + 40, 150)
+        --see if they got the second highest tier.
+    elseif self.score >= self.tier_2 * modifier then
+        --show it as yellow text
+        love.graphics.print({ { 1, 1, 0 }, "\"Carry on my Flapping son!\"" }, VIRTUAL_WIDTH / 2 - 180, 160)
+        --same here.
+        love.graphics.draw(self.award_1, VIRTUAL_WIDTH / 2 + 40, 150)
+        --see if they got the lowest tier.
+    elseif self.score >= self.tier_1 * modifier then
+        --They did bad so show it as red text.
+        love.graphics.print({ { 1, 0, 0 }, "\"You Tried!\"" }, VIRTUAL_WIDTH / 2 - 80, 160)
+        --then draw their award.
+        love.graphics.draw(self.award_0, VIRTUAL_WIDTH / 2 + 40, 150)
+        --somehow they died with 0 points and hadn't even played for 2 seconds. So give them secret award.
+    elseif self.score == 0 and gCurrentPlayTime <= 2 then
+        love.graphics.print({ { 1, 0, 0 }, "DEBUG MESSAGE! YOU SHOULDN'T BE SEEING THIS" }, VIRTUAL_WIDTH / 2 - 20, 160)
     end
+
 
 end

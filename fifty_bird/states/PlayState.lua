@@ -29,6 +29,7 @@ function PlayState:init()
 end
 
 function PlayState:update(dt)
+    gCurrentPlayTime = gCurrentPlayTime + dt;
     -- update timer for pipe spawning
     self.timer = self.timer + dt
 

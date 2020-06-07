@@ -33,6 +33,7 @@ local GROUND_SCROLL_SPEED = 60
 local BACKGROUND_LOOP = 413;
 local ground = love.graphics.newImage('imgs/ground.png')
 local fps_capped = true
+gCurrentPlayTime = 0
 --local bird = Bird()
 --local pipes = {}
 local create_timer = 0
