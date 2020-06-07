@@ -39,15 +39,17 @@ this to use a _true_ timer like it should I am simply capping the FPS to 60 to s
 ]]
 local fps_capped = true
 gCurrentPlayTime = 0
---local bird = Bird()
---local pipes = {}
-local create_timer = 0
+
+
 --some globals.
 gCurrentDifficulty = false
---empty table for right now.
+--commented the lines below out to avoid declaring variables that aren't needed.
+--[[
+--Awards table. Currently empty.
 gAwards = {}
---to hold the ones they already got.
+--TODO:Track awards won.
 gAwardsWon = {}
+]]
 --seed the PRNG with the current time and also the average delta over the last second prior to the game. The PRNG will also be reseeded each time a game is started.
 math.randomseed(os.time() + love.timer.getAverageDelta())
 function love.load()
