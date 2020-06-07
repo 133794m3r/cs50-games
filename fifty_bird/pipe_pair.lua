@@ -1,7 +1,6 @@
 PipePair = Class {}
 
--- size of the gap between pipes
-local GAP_HEIGHT = 200
+
 
 function PipePair:init(y)
     -- flag to hold whether this pair has been scored (jumped through)
@@ -12,11 +11,15 @@ function PipePair:init(y)
 
     -- y value is for the topmost pipe; gap is a vertical shift of the second lower pipe
     self.y = y
-
+    --[[
+     Difficulty modifies how big the gaps are. The easier difficulty.
+     If the person is playing on a harder difficulty the max gap height is 190, but if they are playing on easier difficulty the max is 220.
+     ]]
+    local gap_height_modifier = (gCurrentDifficulty) and 90 or 120
     -- instantiate two pipes that belong to this pair
     self.pipes = {
         ['top'] = Pipe('top', self.y),
-        ['bottom'] = Pipe('bottom', self.y + PIPE_HEIGHT + (math.random(100)) + 100)
+        ['bottom'] = Pipe('bottom', self.y + PIPE_HEIGHT + (math.random(gap_height_modifier)) + 100)
     }
 
     -- whether this pipe pair is ready to be removed from the scene

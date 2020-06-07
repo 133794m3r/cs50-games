@@ -22,8 +22,11 @@ function Bird:collides(pipe)
     -- the 4's are right and bottom offsets
     -- both offsets are used to shrink the bounding box to give the player
     -- a little bit of leeway with the collision
-    if (self.x + 2) + (self.width - 4) >= pipe.x and self.x + 2 <= pipe.x + PIPE_WIDTH then
-        if (self.y + 2) + (self.height - 4) >= pipe.y and self.y + 2 <= pipe.y + PIPE_HEIGHT then
+    --on hard mode the standard leeway is used. On easy mode they get an extra pixel.
+    local leeway_pixels = (gCurrentDifficulty) and 2 or 3
+    local leeway_width = (gCurrentDifficulty) and 4 or 6
+    if (self.x + leeway_pixels) + (self.width - leeway_width) >= pipe.x and self.x + leeway_pixels <= pipe.x + PIPE_WIDTH then
+        if (self.y + leeway_pixels) + (self.height - leeway_width) >= pipe.y and self.y + leeway_pixels <= pipe.y + PIPE_HEIGHT then
             return true
         end
     end
