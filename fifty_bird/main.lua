@@ -32,6 +32,11 @@ local BACKGROUND_SPEED = 30
 local GROUND_SCROLL_SPEED = 60
 local BACKGROUND_LOOP = 413;
 local ground = love.graphics.newImage('imgs/ground.png')
+--[[
+When the guy designed the physics system of this game he was designing it for a 60fps system. Thus each frame tick that
+is higher will screw with the physics and cause the terminal velocity to be hit even faster. To get around having to modify
+this to use a _true_ timer like it should I am simply capping the FPS to 60 to simplify my work.VIRTUAL_WIDTH
+]]
 local fps_capped = true
 gCurrentPlayTime = 0
 --local bird = Bird()

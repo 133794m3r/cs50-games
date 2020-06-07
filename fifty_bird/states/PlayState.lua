@@ -32,23 +32,33 @@ function PlayState:update(dt)
     gCurrentPlayTime = gCurrentPlayTime + dt;
     -- update timer for pipe spawning
     self.timer = self.timer + dt
+    --[[
+     Difficulty modifies how big the gaps are. The easier difficulty.
+     If the person is playing on a harder difficulty the max gap height is 105, but if they are playing on easier
+     difficulty the max is 111. Basically it randomizes it some but not a ton to make it too hard to play with.
+     ]]
 
+    local PIPE_GAP_HEIGHT = (math.random(20) + ((gCurrentDifficulty) and 85 or 91))
     -- spawn a new pipe pair for the randomized time
     if self.timer > self.wait_time then
         -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
         -- no higher than 10 pixels below the top edge of the screen,
-        -- and no lower than a gap length (90 pixels) from the bottom
+        -- and no lower than a gap length (90 pixels) from the) bottom
         local y = math.max(-PIPE_HEIGHT + 10,
-                math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
+                math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - PIPE_GAP_HEIGHT - PIPE_HEIGHT))
         self.lastY = y
 
         -- add a new pipe pair at the end of the screen at our new Y
-        table.insert(self.pipePairs, PipePair(y))
+        table.insert(self.pipePairs, PipePair(y, PIPE_GAP_HEIGHT))
 
         -- reset timer
         self.timer = 0
-
-        self.wait_time = ((gCurrentDifficulty) and 0.75 or 1.5) + (math.random() * 1)
+        --[[
+            Sets the spawn timer based on some random value in seconds. Below are the ranges for this.
+            Hard mode: ~1.25-2.5
+            Easy Mode: ~1.5-2.5
+        ]]
+        self.wait_time = (math.random() + ((gCurrentDifficulty) and 1.25 or 1.5))
     end
     if love.keyboard.was_pressed("p") then
         gStateMachine:change("pause",

@@ -23,6 +23,7 @@ end
 ]]
 function ScoreState:enter(params)
     self.score = params.score
+    self.current_difficulty = gCurrentDifficulty
 end
 
 function ScoreState:update(dt)
@@ -44,11 +45,11 @@ function ScoreState:render()
     love.graphics.printf('Score: ' .. tostring(self.score), 0, 80, VIRTUAL_WIDTH, 'center')
     love.graphics.printf('Press Enter to Play Again!', 0, 205, VIRTUAL_WIDTH, 'center')
     local difficulty = (gCurrentDifficulty) and "hard" or "easy"
-    love.graphics.printf("Difficulty: " .. difficulty, 0, 240, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf("Current Difficulty: " .. difficulty, 0, 240, VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(flappy_font)
     love.graphics.printf("Award ", 0, 110, VIRTUAL_WIDTH, 'center')
-    local modifier = (gCurrentDifficulty) and 2 or 1
+    local modifier = (self.current_difficulty) and 2 or 1
 
     love.graphics.setFont(medium_font)
     --self.score = 15
@@ -77,7 +78,7 @@ function ScoreState:render()
         love.graphics.draw(self.award_0, VIRTUAL_WIDTH / 2 + 40, 150)
         --somehow they died with 0 points and hadn't even played for 2 seconds. So give them secret award.
     elseif self.score == 0 and gCurrentPlayTime <= 2 then
-        love.graphics.print({ { 1, 0, 0 }, "DEBUG MESSAGE! YOU SHOULDN'T BE SEEING THIS" }, VIRTUAL_WIDTH / 2 - 20, 160)
+        love.graphics.printf({ { 1, 0, 0 }, "DEBUG MESSAGE! YOU SHOULDN'T BE SEEING THIS" }, 0, 160, VIRTUAL_WIDTH, 'center')
     end
 
 
