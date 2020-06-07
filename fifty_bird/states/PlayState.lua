@@ -32,7 +32,7 @@ function PlayState:update(dt)
     -- update timer for pipe spawning
     self.timer = self.timer + dt
 
-    -- spawn a new pipe pair every second and a half
+    -- spawn a new pipe pair for the randomized time
     if self.timer > self.wait_time then
         -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
         -- no higher than 10 pixels below the top edge of the screen,
@@ -49,7 +49,12 @@ function PlayState:update(dt)
 
         self.wait_time = ((gCurrentDifficulty) and 0.75 or 1.5) + (math.random() * 1)
     end
-
+    if love.keyboard.was_pressed("p") then
+        gStateMachine:change("pause",
+                {
+                    score = self.score
+                })
+    end
     -- for every pair of pipes..
     for k, pair in pairs(self.pipePairs) do
         -- score a point if the pipe has gone past the bird to the left all the way

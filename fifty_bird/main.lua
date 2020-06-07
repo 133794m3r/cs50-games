@@ -13,7 +13,8 @@ require 'states/PlayState'
 require 'states/ScoreState'
 require 'states/CountdownState'
 require 'states/TitleScreenState'
-
+require 'states/PauseState'
+--objects
 require 'bird'
 require 'pipe'
 require 'pipe_pair'
@@ -31,9 +32,9 @@ local BACKGROUND_SPEED = 30
 local GROUND_SCROLL_SPEED = 60
 local BACKGROUND_LOOP = 413;
 local ground = love.graphics.newImage('imgs/ground.png')
-local fps_capped = false
-local bird = Bird()
-local pipes = {}
+local fps_capped = true
+--local bird = Bird()
+--local pipes = {}
 local create_timer = 0
 --some globals.
 gCurrentDifficulty = false
@@ -85,6 +86,9 @@ function love.load()
         end,
         ['score'] = function()
             return ScoreState()
+        end,
+        ['pause'] = function()
+            return PauseState()
         end
     }
     gStateMachine:change('title')
@@ -160,6 +164,6 @@ end
 
 function display_ui()
     love.graphics.setFont(medium_font)
-    love.graphics.print("FPS: " .. tostring(love.timer.getFPS()), 200, 5)
+    love.graphics.print("FPS: " .. tostring(love.timer.getFPS()), VIRTUAL_WIDTH - 75, 5)
 
 end

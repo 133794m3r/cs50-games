@@ -30,8 +30,9 @@ function TitleScreenState:render()
 
     love.graphics.setFont(medium_font)
     love.graphics.printf('Press Enter', 0, 100, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf("To Limit FPS to 60. Hit the letter \"t\"", 0, 150, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf("To toggle difficulty, press the letter \"d\".", 0, 190, VIRTUAL_WIDTH, "center");
+    love.graphics.printf("To toggle FPS(limit to 60), hit the letter \"t\"", 0, 170, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf("To toggle difficulty, press the letter \"d\".", 0, 210, VIRTUAL_WIDTH, "center");
     local current_difficulty = (gCurrentDifficulty) and "hard" or "easy";
-    love.graphics.print("Current Difficulty: " .. current_difficulty, VIRTUAL_WIDTH - 200, 5)
+
+    love.graphics.printf("Difficulty: " .. current_difficulty, 0, 130, VIRTUAL_WIDTH, 'center')
 end
