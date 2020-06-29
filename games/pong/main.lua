@@ -12,7 +12,7 @@ SCORE_1_X=VIRTUAL_WIDTH/2-50
 SCORE_2_X=VIRTUAL_WIDTH/2+30
 SCORE_Y=VIRTUAL_HEIGHT/3
 --If it was good enough for Atari it's good enough for this. But one frame less to add variance.
-AI_TICK_DELAY=0.116
+AI_TICK_DELAY=8/60
 CURRENT_AI_TICK_DELAY=AI_TICK_DELAY
 function reset_state()
 	player_1_score=0
@@ -58,16 +58,18 @@ function love.keypressed(key)
 	if key == "1" then
 		game_type = 0
 		state="start"
+		player2.color={1,0,0}		
 	--2 player mode.
 	elseif key == "2" then
 		game_type = 1
 		state="start"
+
 	end
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "enter" or key == "return" then
 		if state == "done" then
-			state = "play"
+			state = "init"
 			reset_state()
 		elseif state == "serve" then
 			state = "play"
@@ -138,13 +140,15 @@ function love.update(dt)
 		if player_1_score == 2 or player_2_score == 2 then
 			state="done"
 		end
-		current_ai_tick = current_ai_tick + dt
-		--see if the AI can move.
-		if current_ai_tick >= CURRENT_AI_TICK_DELAY then
-			ai_player:update(dt)
-			--also update the tick delay to a random amount.
-			CURRENT_AI_TICK_DELAY = AI_TICK_DELAY + (math.random(0,2)/60)
-			current_ai_tick = 0			
+		if game_type == 0 then
+			current_ai_tick = current_ai_tick + dt
+			--see if the AI can move.
+			if current_ai_tick >= CURRENT_AI_TICK_DELAY then
+				ai_player:update(dt)
+				--also update the tick delay to a random amount.
+				CURRENT_AI_TICK_DELAY = AI_TICK_DELAY + (math.random(0,2)/60)
+				current_ai_tick = 0			
+			end
 		end
 
 	end

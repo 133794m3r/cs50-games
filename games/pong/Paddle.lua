@@ -1,10 +1,13 @@
 Paddle = Class{}
 
-function Paddle:init(x,y,width,height)
+function Paddle:init(x,y,width,height,color)
 	self.x=x
 	self.y=y
 	self.width=width
 	self.height=height
+	local default={1,1,1}
+	color = color == nil and default or color
+	self.color=color
 	self.dy=0
 end
 
@@ -18,7 +21,9 @@ function Paddle:update(dt)
 end
 
 function Paddle:draw()
+	love.graphics.setColor(self.color)
     love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
+	love.graphics.setColor(1,1,1)
 end
 
 Ai = Class{}
