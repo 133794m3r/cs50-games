@@ -13,6 +13,7 @@ SCORE_2_X=VIRTUAL_WIDTH/2+30
 SCORE_Y=VIRTUAL_HEIGHT/3
 --If it was good enough for Atari it's good enough for this. But one frame less to add variance.
 AI_TICK_DELAY=5/60
+
 CURRENT_AI_TICK_DELAY=AI_TICK_DELAY
 function reset_state()
 	player_1_score=0
@@ -146,7 +147,10 @@ function love.update(dt)
 			if current_ai_tick >= CURRENT_AI_TICK_DELAY then
 				ai_player:update(dt)
 				--also update the tick delay to a random amount.
+
 				CURRENT_AI_TICK_DELAY = ((AI_TICK_DELAY  *MODIFIED_TICK_DELAY))
+
+				--CURRENT_AI_TICK_DELAY = AI_TICK_DELAY + (math.random(0,2)/60)
 				current_ai_tick = 0			
 			end
 		end

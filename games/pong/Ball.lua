@@ -35,7 +35,10 @@ function Ball:update(dt)
 	if self.y > VIRTUAL_HEIGHT - self.height then
 		self.y = self.y - self.height / 2
 		self.dy = -self.dy
+<<<<<<< HEAD:games/pong/Ball.lua
 		hit_wall=true
+=======
+>>>>>>> e8b2a25574b60b27cf3e129e73bbb6754d1852e9:Ball.lua
 	end
 	return hit_wall
 	
@@ -46,7 +49,11 @@ function Ball:collides(paddle)
 	elseif self.y > paddle.y + paddle.height or paddle.y > self.y + self.height then
 		return false
 	else
+<<<<<<< HEAD:games/pong/Ball.lua
 		ball.dy = -((ball.dy*math.random(0.9,1.05))+0.025)
+=======
+		ball.dy = -ball.dy
+>>>>>>> e8b2a25574b60b27cf3e129e73bbb6754d1852e9:Ball.lua
 		return true
 	end
 end
