@@ -167,8 +167,8 @@ function Brick:hit(powerups)
 					--printf("self.x:%f self.y:%f\npowerups x:%f y:%f\n",self.x,self.y,
 					--
 					--		powerups['key'].x,powerups['key'].y)
-					powerups['key'].x=self.x
-					powerups['key'].y=self.y
+					--powerups['key'].x=self.x
+					--powerups['key'].y=self.y
                     self.powerup_collected = true
                     powerups['key'].state = 1
                 end

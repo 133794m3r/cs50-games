@@ -15,15 +15,15 @@
 
 Ball = Class{}
 
-function Ball:init(skin)
+function Ball:init(skin,dy,dx)
     -- simple positional and dimensional variables
     self.width = 8
     self.height = 8
 
     -- these variables are for keeping track of our velocity on both the
     -- X and Y axis, since the ball can move in two dimensions
-    self.dy = 0
-    self.dx = 0
+    self.dy = dy
+    self.dx = dx
 
     -- this will effectively be the color of our ball, and we will index
     -- our table of Quads relating to the global block texture using this
@@ -90,4 +90,186 @@ function Ball:render()
     -- gBallFrames is a table of quads mapping to each individual ball skin in the texture
     love.graphics.draw(gTextures['main'], gFrames['balls'][self.skin],
         self.x, self.y)
+end
+
+MultiBall = Class{}
+
+function MultiBall:init(num_balls,dy,dx,skin)
+    self.num_balls = num_balls == nil and 1 or num_balls
+    self.balls = {}
+
+    for i=1,self.num_balls do
+        self.balls[i] = Ball(skin,dy,dx)
+    end
+    for key,val in pairs(self.balls) do
+        printf('k:%d v:%d',key,val.skin)
+    end
+end
+function MultiBall:track(paddle)
+    printf("%d\n",self.balls)
+    for _,ball in pairs(self.balls) do
+        ball.x = paddle.x + (paddle.width / 2) - 4
+        ball.y = paddle.y - 8
+    end
+end
+function MultiBall:reset()
+    for _,ball in pairs(self.balls) do
+        ball.reset()
+    end
+end
+
+function MultiBall:collides(target)
+
+end
+
+function MultiBall:spawn()
+    -- give ball random starting velocity
+    for _,ball in pairs(self.balls) do
+        ball.dx = math.random(-200, 200)
+        ball.dy = math.random(-50, -60)
+    end
+end
+function MultiBall:paddle_collision(paddle)
+    for i,ball in pairs(self.balls) do
+        if self.balls[i]:collides(paddle) then
+            -- raise ball above paddle in case it goes below it, then reverse dy
+            self.balls[i].y = paddle.y - 8
+            self.balls[i].dy = -self.balls[i].dy
+
+            --
+            -- tweak angle of bounce based on where it hits the paddle
+            --
+
+            -- if we hit the paddle on its left side while moving left...
+            if self.balls[i].x < paddle.x + (paddle.width / 2) and paddle.dx < 0 then
+                self.balls[i].dx = -50 + -(8 * (paddle.x + paddle.width / 2 - self.balls[i].x))
+
+                -- else if we hit the paddle on its right side while moving right...
+            elseif self.balls[i].x > paddle.x + (paddle.width / 2) and self.paddle.dx > 0 then
+                self.balls[i].dx = 50 + (8 * math.abs(paddle.x + paddle.width / 2 - self.balls[i].x))
+            end
+
+            gSounds['paddle-hit']:play()
+        end
+
+    end
+end
+
+function MultiBall:update(dt)
+    for _,ball in pairs(self.balls) do
+        ball:update(dt)
+    end
+end
+
+function MultiBall:render()
+    for _,ball in pairs(self.balls) do
+        love.graphics.draw(gTextures['main'], gFrames['balls'][ball.skin],
+                ball.x, ball.y)
+    end
+end
+
+function MultiBall:lives(health)
+    local life_lost = false
+    for i,ball in pairs(self.balls) do
+        -- if ball goes below bounds, revert to serve state and decrease health
+        if ball.y >= VIRTUAL_HEIGHT then
+            health = health - 1
+            gSounds['hurt']:play()
+            if health == 0 then
+                return health,true
+            else
+                life_lost = true
+            end
+        end
+
+    end
+    return health,life_lost
+
+end
+
+function MultiBall:bricks(powerUps,brick,score,recoverPoints,health)
+    local locked = 0
+    
+    for i=1,self.num_balls do
+        -- only check collision if we're in play
+        if brick.inPlay and self.balls[i]:collides(brick) then
+
+            -- add to score
+            if brick.locked == false then
+                score = score + (brick.tier * 200 + brick.color * 25)
+            end
+
+
+            -- trigger the brick's hit function, which removes it from play
+            locked = brick:hit(powerUps)
+            if locked then
+                powerUps['key'].state = 0
+            end
+
+            -- if we have enough points, recover a point of health
+            if score > recoverPoints then
+                -- can't go above 3 health
+                health = math.min(3, health + 1)
+
+                -- multiply recover points by 2
+                recoverPoints = math.min(100000, recoverPoints * 2)
+
+                -- play recover sound effect
+                gSounds['recover']:play()
+            end
+
+            -- go to our victory screen if there are no more bricks left
+
+
+            --
+            -- collision code for bricks
+            --
+            -- we check to see if the opposite side of our velocity is outside of the brick;
+            -- if it is, we trigger a collision on that side. else we're within the X + width of
+            -- the brick and should check to see if the top or bottom edge is outside of the brick,
+            -- colliding on the top or bottom accordingly
+            --
+
+            -- left edge; only check if we're moving right, and offset the check by a couple of pixels
+            -- so that flush corner hits register as Y flips, not X flips
+            if self.balls[i].x + 2 < brick.x and self.balls[i].dx > 0 then
+
+                -- flip x velocity and reset position outside of brick
+                self.balls[i].dx = -self.balls[i].dx
+                self.balls[i].x = brick.x - 8
+
+                -- right edge; only check if we're moving left, , and offset the check by a couple of pixels
+                -- so that flush corner hits register as Y flips, not X flips
+            elseif self.balls[i].x + 6 > brick.x + brick.width and self.balls[i].dx < 0 then
+
+                -- flip x velocity and reset position outside of brick
+                self.balls[i].dx = -self.balls[i].dx
+                self.balls[i].x = brick.x + 32
+
+                -- top edge if no X collisions, always check
+            elseif self.balls[i].y < brick.y then
+
+                -- flip y velocity and reset position outside of brick
+                self.balls[i].dy = -self.balls[i].dy
+                self.balls[i].y = brick.y - 8
+
+                -- bottom edge if no X collisions or top collision, last possibility
+            else
+
+                -- flip y velocity and reset position outside of brick
+                self.balls[i].dy = -self.balls[i].dy
+                self.balls[i].y = brick.y + 16
+            end
+
+            -- slightly scale the y velocity to speed up the game, capping at +- 150
+            if math.abs(self.balls[i].dy) < 150 then
+                self.balls[i].dy = self.balls[i].dy * 1.02
+            end
+
+            -- only allow colliding with one brick, for corners
+            break
+        end
+    end
+    --printf("score:%d rp:%d health:%d\n",score,recoverPoints,health)
+    return score,recoverPoints,health
 end

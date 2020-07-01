@@ -132,7 +132,8 @@ function LevelMaker.createMap(level)
     --PowerUps['glue']=PowerUp(8,255,nil,nil,50)
     bricks[#bricks-1].powerup = 'key'
 
-    local pu = PowerUp(10,0,bricks[#bricks-1],nil,50)
+    --local pu = PowerUp(10,0,bricks[#bricks-1],nil,50)
+    local pu = KeyPowerUp(bricks[#bricks-1],nil)
 
     PowerUps['key'] = pu
     local data = {}

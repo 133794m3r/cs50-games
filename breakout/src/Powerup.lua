@@ -17,8 +17,8 @@ function PowerUp:init(type,duration,brick,paddle,dy)
     -- how long the item should be active once the collected state is set to true.
     self.duration = duration
     -- spawn it in the middle of the brick.
-    self.x = brick.x + ((brick.x / 2) - 16)
-    self.y = brick.y + ((brick.y / 2) - 8)
+    self.x = brick.x + 16
+    self.y = brick.y + 8
 
 
     -- set the velocity in the y direction.
@@ -74,4 +74,8 @@ function PowerUp:render()
     if self.state == 1 then
         love.graphics.draw(gTextures['main'], gFrames['powerups'][10], self.x, self.y)
     end
+end
+
+function KeyPowerUp(brick,dy,paddle)
+    return PowerUp(10,0,brick,dy,0,paddle)
 end

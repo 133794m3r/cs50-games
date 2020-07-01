@@ -26,16 +26,16 @@ function ServeState:enter(params)
     self.level = params.level
     self.recoverPoints = params.recoverPoints
     self.power_ups = params.power_ups
-    -- init new ball (random color for fun)
-    self.ball = Ball()
-    self.ball.skin = math.random(7)
+    -- init new balls (random color for fun)
+    self.balls = MultiBall(1,0,0,math.random(7))
 end
 
 function ServeState:update(dt)
     -- have the ball track the player
     self.paddle:update(dt)
-    self.ball.x = self.paddle.x + (self.paddle.width / 2) - 4
-    self.ball.y = self.paddle.y - 8
+    -- can't use a class here for some reason. I guess self isn't passed as it should be if you're calling a method of it
+    self.balls.balls[1].x = self.paddle.x + (self.paddle.width / 2) - 4
+    self.balls.balls[1].y = self.paddle.y - 8
 
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
         -- pass in all important state info to the PlayState
@@ -45,7 +45,7 @@ function ServeState:update(dt)
             health = self.health,
             score = self.score,
             highScores = self.highScores,
-            ball = self.ball,
+            balls = self.balls,
             level = self.level,
             power_ups = self.power_ups,
             recoverPoints = self.recoverPoints
@@ -59,7 +59,7 @@ end
 
 function ServeState:render()
     self.paddle:render()
-    self.ball:render()
+    self.balls:render()
 
     for k, brick in pairs(self.bricks) do
         brick:render()

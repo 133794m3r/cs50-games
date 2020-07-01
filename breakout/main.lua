@@ -276,9 +276,11 @@ end
 function renderHealth(health)
     -- start of our health rendering
     local healthX = VIRTUAL_WIDTH - 100
-    
+    --print("health",health)
+    --printf('health %d\n',health)
     -- render health left
     for i = 1, health do
+
         love.graphics.draw(gTextures['hearts'], gFrames['hearts'][1], healthX, 4)
         healthX = healthX + 11
     end
