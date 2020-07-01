@@ -36,10 +36,10 @@ function LevelMaker.createMap(level)
 
 
     -- randomly choose the number of rows
-    local numRows = math.random(1, 5)
+    local numRows = math.random(1, 2)
 
     -- randomly choose the number of columns, ensuring odd
-    local numCols = math.random(7, 13)
+    local numCols = math.random(7, 9)
     numCols = numCols % 2 == 0 and (numCols + 1) or numCols
 
     -- highest possible spawned brick color in this level; ensure we
@@ -136,16 +136,14 @@ function LevelMaker.createMap(level)
     local pu = KeyPowerUp(bricks[#bricks-1],nil)
 
     PowerUps['key'] = pu
-    local data = {}
-    data['bricks']=bricks
-    data['powerups']=PowerUps
-
-
+    PowerUps['multi'] = MultiBallPowerUp(bricks[1],nil)
+    bricks[1].powerup = 'multi'
 
     -- in the event we didn't generate any bricks, try again
     if #bricks == 0 then
+        print('zero')
         return self.createMap(level)
     else
-        return data
+        return bricks,PowerUps
     end
 end

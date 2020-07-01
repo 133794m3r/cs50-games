@@ -72,10 +72,14 @@ end
 
 function PowerUp:render()
     if self.state == 1 then
-        love.graphics.draw(gTextures['main'], gFrames['powerups'][10], self.x, self.y)
+        love.graphics.draw(gTextures['main'], gFrames['powerups'][self.type], self.x, self.y)
     end
 end
 
 function KeyPowerUp(brick,dy,paddle)
     return PowerUp(10,0,brick,dy,0,paddle)
+end
+
+function MultiBallPowerUp(brick,dy,paddle)
+    return PowerUp(9,0,brick,dy,0,paddle)
 end

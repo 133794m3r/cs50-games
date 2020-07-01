@@ -25,7 +25,7 @@ function ServeState:enter(params)
     self.highScores = params.highScores
     self.level = params.level
     self.recoverPoints = params.recoverPoints
-    self.power_ups = params.power_ups
+    self.powerups = params.powerups
     -- init new balls (random color for fun)
     self.balls = MultiBall(1,0,0,math.random(7))
 end
@@ -47,7 +47,7 @@ function ServeState:update(dt)
             highScores = self.highScores,
             balls = self.balls,
             level = self.level,
-            power_ups = self.power_ups,
+            powerups = self.powerups,
             recoverPoints = self.recoverPoints
         })
     end
@@ -60,7 +60,6 @@ end
 function ServeState:render()
     self.paddle:render()
     self.balls:render()
-
     for k, brick in pairs(self.bricks) do
         brick:render()
     end

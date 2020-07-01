@@ -24,7 +24,8 @@ function Ball:init(skin,dy,dx)
     -- X and Y axis, since the ball can move in two dimensions
     self.dy = dy
     self.dx = dx
-
+    self.x = VIRTUAL_WIDTH / 2 - 2
+    self.y = VIRTUAL_HEIGHT / 2 - 2
     -- this will effectively be the color of our ball, and we will index
     -- our table of Quads relating to the global block texture using this
     self.skin = skin
@@ -101,10 +102,31 @@ function MultiBall:init(num_balls,dy,dx,skin)
     for i=1,self.num_balls do
         self.balls[i] = Ball(skin,dy,dx)
     end
-    for key,val in pairs(self.balls) do
-        printf('k:%d v:%d',key,val.skin)
+
+end
+function MultiBall:add(number)
+
+    if self.num_balls < 5 then
+        local additional = math.min(number,(5 - self.num_balls))
+        self.num_balls = 5
+        local dx = math.random(-200, 200)
+        local dy = math.random(-50, -60)
+        for i=1,additional do
+            self.balls[i]=Ball(math.random(7),dx,dy)
+            dx = -dx
+            dy = -dy
+        end
+        --printf("num_balls:%d\n #self.balls:%d\n",self.num_balls,#self.balls)
+        --for k,v in pairs(self.balls) do
+        --    printf("ball #%s\n",k)
+        --    for k,v in pairs(v) do
+        --        printf("k:%s v:%s\n",k,v)
+        --    end
+        --    printf("\n\n")
+        --end
     end
 end
+
 function MultiBall:track(paddle)
     printf("%d\n",self.balls)
     for _,ball in pairs(self.balls) do
@@ -118,9 +140,6 @@ function MultiBall:reset()
     end
 end
 
-function MultiBall:collides(target)
-
-end
 
 function MultiBall:spawn()
     -- give ball random starting velocity
@@ -145,7 +164,7 @@ function MultiBall:paddle_collision(paddle)
                 self.balls[i].dx = -50 + -(8 * (paddle.x + paddle.width / 2 - self.balls[i].x))
 
                 -- else if we hit the paddle on its right side while moving right...
-            elseif self.balls[i].x > paddle.x + (paddle.width / 2) and self.paddle.dx > 0 then
+            elseif self.balls[i].x > paddle.x + (paddle.width / 2) and paddle.dx > 0 then
                 self.balls[i].dx = 50 + (8 * math.abs(paddle.x + paddle.width / 2 - self.balls[i].x))
             end
 
@@ -173,12 +192,17 @@ function MultiBall:lives(health)
     for i,ball in pairs(self.balls) do
         -- if ball goes below bounds, revert to serve state and decrease health
         if ball.y >= VIRTUAL_HEIGHT then
-            health = health - 1
-            gSounds['hurt']:play()
-            if health == 0 then
-                return health,true
-            else
-                life_lost = true
+            table.remove(self.balls,i)
+            self.num_balls = self.num_balls - 1
+            if self.num_balls <= 0 then
+                health = health - 1
+                gSounds['hurt']:play()
+
+                if health <= 0 then
+                    return health,true
+
+                end
+
             end
         end
 
@@ -188,22 +212,24 @@ function MultiBall:lives(health)
 end
 
 function MultiBall:bricks(powerUps,brick,score,recoverPoints,health)
-    local locked = 0
-    
-    for i=1,self.num_balls do
+    local locked = false
+    local num_unlocked = 0
+    --for i=1,self.num_balls do
+    for _,ball in pairs(self.balls) do
         -- only check collision if we're in play
-        if brick.inPlay and self.balls[i]:collides(brick) then
+        --printf('i:%d balls[i].skin:%d\n',i,self.balls[i].skin)
+        if brick.inPlay and ball:collides(brick) then
 
             -- add to score
             if brick.locked == false then
                 score = score + (brick.tier * 200 + brick.color * 25)
             end
 
-
             -- trigger the brick's hit function, which removes it from play
             locked = brick:hit(powerUps)
             if locked then
                 powerUps['key'].state = 0
+                num_unlocked = num_unlocked + 1
             end
 
             -- if we have enough points, recover a point of health
@@ -232,38 +258,38 @@ function MultiBall:bricks(powerUps,brick,score,recoverPoints,health)
 
             -- left edge; only check if we're moving right, and offset the check by a couple of pixels
             -- so that flush corner hits register as Y flips, not X flips
-            if self.balls[i].x + 2 < brick.x and self.balls[i].dx > 0 then
+            if ball.x + 2 < brick.x and ball.dx > 0 then
 
                 -- flip x velocity and reset position outside of brick
-                self.balls[i].dx = -self.balls[i].dx
-                self.balls[i].x = brick.x - 8
+                ball.dx = -ball.dx
+                ball.x = brick.x - 8
 
                 -- right edge; only check if we're moving left, , and offset the check by a couple of pixels
                 -- so that flush corner hits register as Y flips, not X flips
-            elseif self.balls[i].x + 6 > brick.x + brick.width and self.balls[i].dx < 0 then
+            elseif ball.x + 6 > brick.x + brick.width and ball.dx < 0 then
 
                 -- flip x velocity and reset position outside of brick
-                self.balls[i].dx = -self.balls[i].dx
-                self.balls[i].x = brick.x + 32
+                ball.dx = -ball.dx
+                ball.x = brick.x + 32
 
                 -- top edge if no X collisions, always check
-            elseif self.balls[i].y < brick.y then
+            elseif ball.y < brick.y then
 
                 -- flip y velocity and reset position outside of brick
-                self.balls[i].dy = -self.balls[i].dy
-                self.balls[i].y = brick.y - 8
+                ball.dy = -ball.dy
+                ball.y = brick.y - 8
 
                 -- bottom edge if no X collisions or top collision, last possibility
             else
 
                 -- flip y velocity and reset position outside of brick
-                self.balls[i].dy = -self.balls[i].dy
-                self.balls[i].y = brick.y + 16
+                ball.dy = -ball.dy
+                ball.y = brick.y + 16
             end
 
             -- slightly scale the y velocity to speed up the game, capping at +- 150
-            if math.abs(self.balls[i].dy) < 150 then
-                self.balls[i].dy = self.balls[i].dy * 1.02
+            if math.abs(ball.dy) < 150 then
+                ball.dy = ball.dy * 1.02
             end
 
             -- only allow colliding with one brick, for corners
@@ -271,5 +297,5 @@ function MultiBall:bricks(powerUps,brick,score,recoverPoints,health)
         end
     end
     --printf("score:%d rp:%d health:%d\n",score,recoverPoints,health)
-    return score,recoverPoints,health
+    return score,recoverPoints,health,num_unlocked
 end

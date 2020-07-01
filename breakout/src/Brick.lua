@@ -130,26 +130,27 @@ end
 	changing its color otherwise.
 ]]
 function Brick:hit(powerups)
-	-- set the particle system to interpolate between two colors; in this case, we give
-	-- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
-	-- over the particle's lifetime (the second color)
-	self.psystem:setColors(
-		paletteColors[self.color].r,
-		paletteColors[self.color].g,
-		paletteColors[self.color].b,
-		55 * (self.tier + 1),
-		paletteColors[self.color].r,
-		paletteColors[self.color].g,
-		paletteColors[self.color].b,
-		0
-	)
-	self.psystem:emit(64)
+
 
 	-- sound on hit
 	gSounds['brick-hit-2']:stop()
 	gSounds['brick-hit-2']:play()
 
 	if not self.locked then
+		-- set the particle system to interpolate between two colors; in this case, we give
+		-- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
+		-- over the particle's lifetime (the second color)
+		self.psystem:setColors(
+				paletteColors[self.color].r,
+				paletteColors[self.color].g,
+				paletteColors[self.color].b,
+				55 * (self.tier + 1),
+				paletteColors[self.color].r,
+				paletteColors[self.color].g,
+				paletteColors[self.color].b,
+				0
+		)
+		self.psystem:emit(64)
 		-- if we're at a higher tier than the base, we need to go down a tier
 		-- if we're already at the lowest color, else just go down a color
 		if self.tier > 0 then
@@ -164,13 +165,9 @@ function Brick:hit(powerups)
 			if self.color == 1 then
 				self.inPlay = false
                 if self.powerup ~= nil then
-					--printf("self.x:%f self.y:%f\npowerups x:%f y:%f\n",self.x,self.y,
-					--
-					--		powerups['key'].x,powerups['key'].y)
-					--powerups['key'].x=self.x
-					--powerups['key'].y=self.y
                     self.powerup_collected = true
-                    powerups['key'].state = 1
+					powerups[self.powerup].state = 1
+                    --powerups['key'].state = 1
                 end
 
 			else
