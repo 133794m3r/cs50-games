@@ -9,7 +9,21 @@
 
     Helper functions for writing games.
 ]]
+--locked block.
+-- x=  32 * 5, y = 16*4
+function GenerateQuadsPowerUPs(atlas)
+    local sheetCounter = 1
+    local spritesheet = {}
 
+    for x = 0, 10 do
+        spritesheet[sheetCounter] =
+        love.graphics.newQuad(x * 16, 192, 16,
+                16, atlas:getDimensions())
+        sheetCounter = sheetCounter + 1
+    end
+
+    return spritesheet
+end
 --[[
     Given an "atlas" (a texture with multiple sprites), as well as a
     width and a height for the tiles therein, split the texture into
@@ -55,9 +69,14 @@ end
     we have to return a subset of GenerateQuads.
 ]]
 function GenerateQuadsBricks(atlas)
-    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    local brick_quads = GenerateQuads(atlas, 32, 16)
+    local bricks = table.slice(brick_quads,1,21)
+    table.insert(bricks,brick_quads[24])
+    return bricks
 end
-
+printf = function(s,...)
+    return io.write(s:format(...))
+end -- function
 --[[
     This function is specifically made to piece out the paddles from the
     sprite sheet. For this, we have to piece out the paddles a little more
@@ -124,4 +143,21 @@ function GenerateQuadsBalls(atlas)
     end
 
     return quads
+end
+
+---Sets the color used for drawing.
+---@param red number @The amount of red.
+---@param green number @The amount of green.
+---@param blue number @The amount of blue.
+---@param alpha number @The amount of alpha. The alpha value will be applied to all subsequent draw operations, even the drawing of an image.
+---@overload fun(rgba:table):void
+function love.setColor(red,green,blue,alpha)
+    if a == nil then
+        a = 255
+    end
+    if LOVE_VERSION_11 then
+        love.graphics.setColor(red/255,green/255,blue/255,alpha/255)
+    else
+        love.graphics.setColor(red,green,blue,alpha)
+    end
 end

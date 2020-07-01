@@ -32,6 +32,8 @@ LevelMaker = Class{}
 ]]
 function LevelMaker.createMap(level)
     local bricks = {}
+    local PowerUps = {}
+
 
     -- randomly choose the number of rows
     local numRows = math.random(1, 5)
@@ -45,8 +47,8 @@ function LevelMaker.createMap(level)
     local highestTier = math.min(3, math.floor(level / 5))
 
     -- highest color of the highest tier, no higher than 5
-    local highestColor = math.min(5, level % 5 + 3)
-
+    --local highestColor = math.min(5, level % 5 + 3)
+    local highestColor = 1
     -- lay out bricks such that they touch each other and fill the space
     for y = 1, numRows do
         -- whether we want to enable skipping for this row
@@ -117,12 +119,32 @@ function LevelMaker.createMap(level)
             -- Lua's version of the 'continue' statement
             ::continue::
         end
-    end 
+    end
+    bricks[#bricks].locked=true
+   --if level > 1 then
+   --     local brick_number = math.random(1,#bricks*2)
+   --     if brick_number <= #bricks then
+   --         bricks[brick_number].locked=true
+   --     end
+   -- end
+    PowerUps['key']={}
+    --PowerUps['multi']=PowerUp(9,0,nil,nil,50)
+    --PowerUps['glue']=PowerUp(8,255,nil,nil,50)
+    bricks[#bricks-1].powerup = 'key'
+
+    local pu = PowerUp(10,0,bricks[#bricks-1],nil,50)
+
+    PowerUps['key'] = pu
+    local data = {}
+    data['bricks']=bricks
+    data['powerups']=PowerUps
+
+
 
     -- in the event we didn't generate any bricks, try again
     if #bricks == 0 then
         return self.createMap(level)
     else
-        return bricks
+        return data
     end
 end

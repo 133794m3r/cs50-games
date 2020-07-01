@@ -66,7 +66,8 @@ function love.load()
         ['paddles'] = GenerateQuadsPaddles(gTextures['main']),
         ['balls'] = GenerateQuadsBalls(gTextures['main']),
         ['bricks'] = GenerateQuadsBricks(gTextures['main']),
-        ['hearts'] = GenerateQuads(gTextures['hearts'], 10, 9)
+        ['hearts'] = GenerateQuads(gTextures['hearts'], 10, 9),
+        ['powerups'] = GenerateQuadsPowerUPs(gTextures['main'])
     }
     
     -- initialize our virtual resolution, which will be rendered within our
@@ -297,9 +298,9 @@ function displayFPS()
     love.graphics.setFont(gFonts['small'])
     -- Check if they're running >=love11. If so we use the other colors.
     if LOVE_VERSION_11 then
-        love.graphics.setColor(0,1,0,1)
+        love.setColor(0,1,0,1)
     else
-        love.graphics.setColor(0, 255, 0, 255)
+        love.setColor(0, 255, 0, 255)
 
     end
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)

@@ -44,10 +44,12 @@ function PaddleSelectState:update(dt)
     -- select paddle and move on to the serve state, passing in the selection
     if love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
         gSounds['confirm']:play()
+        local level_data = LevelMaker.createMap(1)
 
         gStateMachine:change('serve', {
             paddle = Paddle(self.currentPaddle),
-            bricks = LevelMaker.createMap(1),
+            bricks = level_data['bricks'],
+            power_ups = level_data['powerups'],
             health = 3,
             score = 0,
             highScores = self.highScores,
@@ -74,44 +76,30 @@ function PaddleSelectState:render()
     -- in a shadowy form to let us know we're as far left as we can go
     if self.currentPaddle == 1 then
         -- tint; give it a dark gray with half opacity
-        if LOVE_VERSION_11 then
-                love.graphics.setColor(0.157,0.157,0.157,0.502)
-            else
-                love.graphics.setColor(40, 40, 40, 128)
-        end
+        love.setColor(40, 40, 40, 128)
+
     end
     
     love.graphics.draw(gTextures['arrows'], gFrames['arrows'][1], VIRTUAL_WIDTH / 4 - 24,
         VIRTUAL_HEIGHT - VIRTUAL_HEIGHT / 3)
    
     -- reset drawing color to full white for proper rendering
-    if LOVE_VERSION_11 then
-        love.graphics.setColor(1,1,1,1)
-    else
-        love.graphics.setColor(255, 255, 255, 255)
-    end
+    love.setColor(255, 255, 255, 255)
 
     -- right arrow; should render normally if we're less than 4, else
     -- in a shadowy form to let us know we're as far right as we can go
     if self.currentPaddle == 4 then
-        --[[ tint; give it a dark gray with half opacity
-        Check if they're running >=love11. If so we use the other colors.     ]]
-        if LOVE_VERSION_11 then
-            love.graphics.setColor(0.157,0.157,0.157,0.502)
-        else
-            love.graphics.setColor(40, 40, 40, 128)
-        end
+        -- tint; give it a dark gray with half opacity
+        love.setColor(40, 40, 40, 128)
+
     end
 
     love.graphics.draw(gTextures['arrows'], gFrames['arrows'][2], VIRTUAL_WIDTH - VIRTUAL_WIDTH / 4,
         VIRTUAL_HEIGHT - VIRTUAL_HEIGHT / 3)
 
     -- reset drawing color to full white for proper rendering
-    if LOVE_VERSION_11 then
-        love.graphics.setColor(1,1,1,1)
-    else
-        love.graphics.setColor(255, 255, 255, 255)
-    end
+    love.setColor(255, 255, 255, 255)
+
 
     -- draw the paddle itself, based on which we have selected
     love.graphics.draw(gTextures['main'], gFrames['paddles'][2 + 4 * (self.currentPaddle - 1)],
