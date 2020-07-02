@@ -41,7 +41,30 @@ function Paddle:init(skin)
     -- is the starting size, as the smallest is too tough to start with
     self.size = 2
 end
-
+function Paddle:reset()
+    self.size = 2
+    self.width = 64
+    self.height = 16
+end
+function Paddle:resize(size)
+    local lut = {
+        [1] = {32,16},
+        [2] = {64,16},
+        [3] = {96,16},
+        [4] = {128,16}
+    }
+    if size == -1 then
+        if self.size >= 2 then
+            self.size = self.size - 1
+        end
+    else
+        if self.size <= 3 then
+            self.size = self.size + 1
+        end
+    end
+    self.width = lut[self.size][1]
+    self.height = lut[self.size][2]
+end
 function Paddle:update(dt)
     -- keyboard input
     if love.keyboard.isDown('left') then

@@ -169,7 +169,6 @@ function Brick:hit(power_ups,num_locked)
 						power_ups[self.powerup].state = 1
 					else
 						power_ups[self.powerup].state  = 1
-
 					end
                 end
 

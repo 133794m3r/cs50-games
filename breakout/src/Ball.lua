@@ -15,7 +15,7 @@
 
 Ball = Class{}
 
-function Ball:init(skin,dy,dx)
+function Ball:init(skin,dy,dx,x,y)
     -- simple positional and dimensional variables
     self.width = 8
     self.height = 8
@@ -24,8 +24,8 @@ function Ball:init(skin,dy,dx)
     -- X and Y axis, since the ball can move in two dimensions
     self.dy = dy
     self.dx = dx
-    self.x = VIRTUAL_WIDTH / 2 - 2
-    self.y = VIRTUAL_HEIGHT / 2 - 2
+    self.x = x == nil and  VIRTUAL_WIDTH / 2 - 2 or x
+    self.y = y == nil and VIRTUAL_HEIGHT / 2 - 2 or y
     -- this will effectively be the color of our ball, and we will index
     -- our table of Quads relating to the global block texture using this
     self.skin = skin
@@ -108,11 +108,13 @@ function MultiBall:add(number)
 
     if self.num_balls < 5 then
         local additional = math.min(number,(5 - self.num_balls))
-        self.num_balls = 5
+        self.num_balls = (additional-1) + self.num_balls
+        local x = self.balls[1].x
+        local y = self.balls[1].y
         for i=2,additional do
-            local dx = math.random(-200, 200)
-            local dy = math.random(-50, -60)
-            self.balls[i]=Ball(math.random(7),dx,dy)
+            local dx = math.random(-100, 100)
+            local dy = math.random(-30, 30)
+            self.balls[i]=Ball(math.random(7),dx,dy,x,y)
 
         end
         --printf("num_balls:%d\n #self.balls:%d\n",self.num_balls,#self.balls)
@@ -190,8 +192,10 @@ function MultiBall:lives(health)
     local life_lost = false
 
     for i,ball in pairs(self.balls) do
+
         -- if ball goes below bounds, revert to serve state and decrease health
         if ball.y >= VIRTUAL_HEIGHT then
+            print(#self.balls)
             print('nb',self.num_balls)
             table.remove(self.balls,i)
             self.num_balls = self.num_balls - 1
@@ -227,7 +231,6 @@ function MultiBall:bricks(power_ups,brick,score,recoverPoints,health,num_locked)
             -- trigger the brick's hit function, which removes it from play
             locked = brick:hit(power_ups,num_locked)
             if locked then
-                print('locked')
                 power_ups['key'].state = 0
                 num_locked = num_locked  > 0 and num_locked -1 or num_locked
             end

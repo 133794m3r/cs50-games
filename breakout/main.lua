@@ -46,6 +46,7 @@ function love.load()
     gFonts = {
         ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
         ['medium'] = love.graphics.newFont('fonts/font.ttf', 16),
+        ['help'] = love.graphics.newFont('fonts/font.ttf',24),
         ['large'] = love.graphics.newFont('fonts/font.ttf', 32)
     }
     love.graphics.setFont(gFonts['small'])
@@ -117,7 +118,8 @@ function love.load()
         ['victory'] = function() return VictoryState() end,
         ['high-scores'] = function() return HighScoreState() end,
         ['enter-high-score'] = function() return EnterHighScoreState() end,
-        ['paddle-select'] = function() return PaddleSelectState() end
+        ['paddle-select'] = function() return PaddleSelectState() end,
+        ['help'] = function() return HelpState() end
     }
     gStateMachine:change('start', {
         highScores = loadHighScores()
@@ -299,13 +301,22 @@ function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(gFonts['small'])
     -- Check if they're running >=love11. If so we use the other colors.
-    if LOVE_VERSION_11 then
-        love.setColor(0,1,0,1)
-    else
-        love.setColor(0, 255, 0, 255)
 
+    love.setColor(0, 255, 0, 255)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()),5,35)
+end
+
+function displayPowerUPs(power_ups)
+    love.graphics.setFont(gFonts['small'])
+    love.setColor(255,255,255)
+    love.graphics.print('Power UP',3,5)
+    local x = 0
+    for _,power_up in pairs(power_ups) do
+        if power_up.state == 2 then
+            love.graphics.draw(gTextures['main'], gFrames['powerups'][power_up.type], x, 15,0,1,1)
+            x = x + 16
+        end
     end
-    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)
 end
 
 --[[

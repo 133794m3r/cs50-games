@@ -18,7 +18,7 @@
 StartState = Class{__includes = BaseState}
 
 -- whether we're highlighting "Start" or "High Scores"
-local highlighted = 1
+local highlighted = 3
 
 function StartState:enter(params)
     self.highScores = params.highScores
@@ -26,8 +26,20 @@ end
 
 function StartState:update(dt)
     -- toggle highlighted option if we press an arrow key up or down
-    if love.keyboard.wasPressed('up') or love.keyboard.wasPressed('down') then
-        highlighted = highlighted == 1 and 2 or 1
+    if love.keyboard.wasPressed('up') then
+        if highlighted == 1 then
+            highlighted = 3
+        else
+            highlighted = highlighted - 1
+        end
+        gSounds['paddle-hit']:play()
+        --highlighted = highlighted == 1 and 2 or 1
+    elseif love.keyboard.wasPressed('down') then
+        if highlighted == 3 then
+            highlighted = 1
+        else
+            highlighted = highlighted + 1
+        end
         gSounds['paddle-hit']:play()
     end
 
@@ -39,8 +51,12 @@ function StartState:update(dt)
             gStateMachine:change('paddle-select', {
                 highScores = self.highScores
             })
-        else
+        elseif highlighted == 2 then
             gStateMachine:change('high-scores', {
+                highScores = self.highScores
+            })
+        else
+            gStateMachine:change('help',{
                 highScores = self.highScores
             })
         end
@@ -65,7 +81,7 @@ function StartState:render()
     if highlighted == 1 then
         love.setColor(103,255,255,255)
     end
-    love.graphics.printf("START", 0, VIRTUAL_HEIGHT / 2 + 70,
+    love.graphics.printf("START", 0, VIRTUAL_HEIGHT / 2 + 50,
         VIRTUAL_WIDTH, 'center')
 
     -- reset the color
@@ -75,9 +91,13 @@ function StartState:render()
     if highlighted == 2 then
         love.setColor(103, 255, 255, 255)
     end
-    love.graphics.printf("HIGH SCORES", 0, VIRTUAL_HEIGHT / 2 + 90,
+    love.graphics.printf("HIGH SCORES", 0, VIRTUAL_HEIGHT / 2 + 70,
         VIRTUAL_WIDTH, 'center')
 
     -- reset the color
     love.setColor(255, 255, 255, 255)
+    if highlighted == 3 then
+        love.setColor(103,255,255,255)
+    end
+    love.graphics.printf("Get Help",0,VIRTUAL_HEIGHT/2 + 90,VIRTUAL_WIDTH,'center')
 end

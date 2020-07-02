@@ -137,7 +137,9 @@ function LevelMaker.createMap(level)
 
     PowerUps['key'] = pu
     PowerUps['multi'] = MultiBallPowerUp(bricks[1],nil)
+    PowerUps['grow'] = GrowPowerUp(bricks[2],nil)
     bricks[1].powerup = 'multi'
+    bricks[2].powerup = 'grow'
 
     -- in the event we didn't generate any bricks, try again
     if #bricks == 0 then

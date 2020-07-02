@@ -30,9 +30,10 @@ function PlayState:enter(params)
     self.balls = params.balls
     self.level = params.level
     self.num_locked = params.num_locked
+    print('num_locked',params.num_locked)
     self.power_ups = params.power_ups
     self.recoverPoints = 5000
-    self.powerup_tick = 90
+    self.powerup_tick = 20
     self.powerup_timer = 0
     self.movement_timer = 0
     self.render_timer = 0
@@ -56,13 +57,17 @@ function PlayState:update(dt)
             --if self.power_ups[i].state ~= 0 then
             --    print('i',tostring(i),'state',tostring(self.power_ups[i].state),'type',tostring(self.power_ups[i].type))
             --end
-            if self.power_ups[i].state == 2 and self.power_ups[i].type == 9 then
-                self.balls:add(3)
-                self.power_ups[i].state = 0
+            if self.power_ups[i].state == 2 then
+                if self.power_ups[i].type == 9 then
+                    self.balls:add(3)
+                    self.power_ups[i].state = 0
+                end
             end
+
         end
 
     end
+
     if self.powerup_tick <= self.powerup_timer and self.num_locked >= 1 and self.power_ups['key'].state == 0 then
         self.power_ups['key'].state = 1
         self.power_ups['key']:reset()
@@ -95,7 +100,7 @@ function PlayState:update(dt)
 
         if self:checkVictory() then
             gSounds['victory']:play()
-
+            self.paddle:reset()
             gStateMachine:change('victory', {
                 level = self.level,
                 paddle = self.paddle,
@@ -146,18 +151,14 @@ function PlayState:render()
     for k, brick in pairs(self.bricks) do
         brick:renderParticles()
     end
-    --local cur_time = love.timer.getTime()
-    --if self.render_timer <= cur_time then
-    --    self.render_timer = cur_time
-    --else
-    --    love.timer.sleep(self.render_timer - cur_time)
-    --end
+
 
 
     self.paddle:render()
     self.balls:render()
     renderScore(self.score)
     renderHealth(self.health)
+    displayPowerUPs(self.power_ups)
     for i,powerup in pairs(self.power_ups) do
         self.power_ups[i]:render()
     end
@@ -166,20 +167,14 @@ function PlayState:render()
         love.graphics.setFont(gFonts['large'])
         love.graphics.printf("PAUSED", 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, 'center')
     end
-    --displayFPS()
-    -- simple FPS display across all states
-    love.graphics.setFont(gFonts['small'])
-    -- Check if they're running >=love11. If so we use the other colors.
-    love.graphics.setColor(1,1,1,1)
 
-    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)
 end
 
 function PlayState:checkVictory()
     for k, brick in pairs(self.bricks) do
         if brick.inPlay then
             return false
-        end 
+        end
     end
 
     return true

@@ -152,8 +152,8 @@ end
 ---@param alpha number @The amount of alpha. The alpha value will be applied to all subsequent draw operations, even the drawing of an image.
 ---@overload fun(rgba:table):void
 function love.setColor(red,green,blue,alpha)
-    if a == nil then
-        a = 255
+    if alpha == nil then
+        alpha = 255
     end
     if LOVE_VERSION_11 then
         love.graphics.setColor(red/255,green/255,blue/255,alpha/255)
