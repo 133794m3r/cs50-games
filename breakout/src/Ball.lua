@@ -109,12 +109,11 @@ function MultiBall:add(number)
     if self.num_balls < 5 then
         local additional = math.min(number,(5 - self.num_balls))
         self.num_balls = 5
-        local dx = math.random(-200, 200)
-        local dy = math.random(-50, -60)
-        for i=1,additional do
+        for i=2,additional do
+            local dx = math.random(-200, 200)
+            local dy = math.random(-50, -60)
             self.balls[i]=Ball(math.random(7),dx,dy)
-            dx = -dx
-            dy = -dy
+
         end
         --printf("num_balls:%d\n #self.balls:%d\n",self.num_balls,#self.balls)
         --for k,v in pairs(self.balls) do
@@ -189,29 +188,29 @@ end
 
 function MultiBall:lives(health)
     local life_lost = false
+
     for i,ball in pairs(self.balls) do
         -- if ball goes below bounds, revert to serve state and decrease health
         if ball.y >= VIRTUAL_HEIGHT then
+            print('nb',self.num_balls)
             table.remove(self.balls,i)
             self.num_balls = self.num_balls - 1
+            print("nb2",self.num_balls)
             if self.num_balls <= 0 then
                 health = health - 1
                 gSounds['hurt']:play()
-
-                if health <= 0 then
-                    return health,true
-
-                end
+                return health,true
+            end
 
             end
-        end
+
 
     end
     return health,life_lost
 
 end
 
-function MultiBall:bricks(powerUps,brick,score,recoverPoints,health)
+function MultiBall:bricks(power_ups,brick,score,recoverPoints,health,num_locked)
     local locked = false
     local num_unlocked = 0
     --for i=1,self.num_balls do
@@ -226,10 +225,11 @@ function MultiBall:bricks(powerUps,brick,score,recoverPoints,health)
             end
 
             -- trigger the brick's hit function, which removes it from play
-            locked = brick:hit(powerUps)
+            locked = brick:hit(power_ups,num_locked)
             if locked then
-                powerUps['key'].state = 0
-                num_unlocked = num_unlocked + 1
+                print('locked')
+                power_ups['key'].state = 0
+                num_locked = num_locked  > 0 and num_locked -1 or num_locked
             end
 
             -- if we have enough points, recover a point of health
@@ -297,5 +297,5 @@ function MultiBall:bricks(powerUps,brick,score,recoverPoints,health)
         end
     end
     --printf("score:%d rp:%d health:%d\n",score,recoverPoints,health)
-    return score,recoverPoints,health,num_unlocked
+    return score,recoverPoints,health,num_locked
 end

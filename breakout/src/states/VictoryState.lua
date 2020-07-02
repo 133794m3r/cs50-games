@@ -20,6 +20,7 @@ function VictoryState:enter(params)
     self.paddle = params.paddle
     self.health = params.health
     self.ball = params.ball
+    self.num_locked = params.num_locked
     self.recoverPoints = params.recoverPoints
 end
 
@@ -32,13 +33,14 @@ function VictoryState:update(dt)
 
     -- go to play screen if the player presses Enter
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        local bricks,powerups
-        bricks,powerups = LevelMaker.createMap(self.level + 1)
+        --local bricks,power_ups
+        local bricks,power_ups,num_locked = LevelMaker.createMap(self.level + 1)
         gStateMachine:change('serve', {
             level = self.level + 1,
             bricks = bricks,
-            powerups = powerups,
+            power_ups = power_ups,
             bricks = bricks,
+            num_locked = num_locked,
             paddle = self.paddle,
             health = self.health,
             score = self.score,

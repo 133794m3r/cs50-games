@@ -37,9 +37,12 @@ function PowerUp:init(type,duration,brick,paddle,dy)
 end
 
 function PowerUp:update(dt)
+    local collides = false
     if self.state == 1 then
         self.y = self.y  + (dt * self.dy)
-        if self:collides(self.paddle) then
+        collides = self:collides(self.paddle)
+        if collides == true then
+            print(self.type)
             self.state = 2
         elseif self.y >= self.paddle.y then
             self.state = 0
@@ -57,6 +60,7 @@ function PowerUp:collides(target)
 
     -- then check to see if the bottom edge of either is higher than the top
     -- edge of the other
+
     if self.y > target.y + target.height + 2 or target.y > self.y + 14 then
         --printf("sy:%f ty:%f\n",math.floor(self.y),target.y+target.height + 2)
         return false
@@ -67,7 +71,8 @@ function PowerUp:collides(target)
 end
 
 function PowerUp:reset()
-    self.active = false
+    self.x = VIRTUAL_WIDTH / 2
+    self.y = 16
 end
 
 function PowerUp:render()

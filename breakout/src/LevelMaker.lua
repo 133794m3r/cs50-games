@@ -141,9 +141,9 @@ function LevelMaker.createMap(level)
 
     -- in the event we didn't generate any bricks, try again
     if #bricks == 0 then
-        print('zero')
+
         return self.createMap(level)
     else
-        return bricks,PowerUps
+        return bricks,PowerUps,1
     end
 end

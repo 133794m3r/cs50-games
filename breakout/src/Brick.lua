@@ -129,8 +129,7 @@ end
 	Triggers a hit on the brick, taking it out of play if at 0 health or
 	changing its color otherwise.
 ]]
-function Brick:hit(powerups)
-
+function Brick:hit(power_ups,num_locked)
 
 	-- sound on hit
 	gSounds['brick-hit-2']:stop()
@@ -166,8 +165,12 @@ function Brick:hit(powerups)
 				self.inPlay = false
                 if self.powerup ~= nil then
                     self.powerup_collected = true
-					powerups[self.powerup].state = 1
-                    --powerups['key'].state = 1
+					if self.powerup == 'key' and  num_locked >= 1 then
+						power_ups[self.powerup].state = 1
+					else
+						power_ups[self.powerup].state  = 1
+
+					end
                 end
 
 			else
@@ -181,7 +184,9 @@ function Brick:hit(powerups)
 			gSounds['brick-hit-1']:play()
 		end
 	else
-		if powerups['key'].state == 2 then
+		print('key state',power_ups['key'].state)
+		if power_ups['key'].state == 2 then
+			print('locked')
 			self.locked = false
             return true
 		end

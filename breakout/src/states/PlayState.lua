@@ -23,48 +23,53 @@ PlayState = Class{__includes = BaseState}
 function PlayState:enter(params)
     self.paddle = params.paddle
     self.bricks = params.bricks
+    self.num_bricks = #self.bricks
     self.health = params.health
     self.score = params.score
     self.highScores = params.highScores
     self.balls = params.balls
     self.level = params.level
-    self.powerUps = params.powerups
+    self.num_locked = params.num_locked
+    self.power_ups = params.power_ups
     self.recoverPoints = 5000
-    self.powerup_tick = 4
+    self.powerup_tick = 90
     self.powerup_timer = 0
     self.movement_timer = 0
     self.render_timer = 0
     self.balls:spawn()
-    for key,value in pairs(self.powerUps) do
-        self.powerUps[key].paddle = self.paddle
+    for key,value in pairs(self.power_ups) do
+        self.power_ups[key].paddle = self.paddle
     end
     self.min_dt = 1/60
     self.render_timer = love.timer.getTime()
 end
 
 function PlayState:update(dt)
+    --printf("key_state:%d\n",self.power_ups['key'].state)
     self.render_timer = self.render_timer + self.min_dt
     local life_lost=false
-    --self.movement_timer = self.movement_timer + dt
-    if self.powerUps['key'].state == 2 then
-        paused=true
-    end
+    self.powerup_timer = self.powerup_timer + dt
 
     if not self.paused then
-        for i,_ in pairs(self.powerUps) do
-            self.powerUps[i]:update(dt)
-            --if self.powerUps[i].state ~= 0 then
-            --    print('i',tostring(i),'state',tostring(self.powerUps[i].state),'type',tostring(self.powerUps[i].type))
+        for i,_ in pairs(self.power_ups) do
+            self.power_ups[i]:update(dt)
+            --if self.power_ups[i].state ~= 0 then
+            --    print('i',tostring(i),'state',tostring(self.power_ups[i].state),'type',tostring(self.power_ups[i].type))
             --end
-            if self.powerUps[i].state == 2 and self.powerUps[i].type == 9 then
-                print('collected multiball')
+            if self.power_ups[i].state == 2 and self.power_ups[i].type == 9 then
                 self.balls:add(3)
-                self.powerUps[i].state = 0
+                self.power_ups[i].state = 0
             end
         end
 
-
     end
+    if self.powerup_tick <= self.powerup_timer and self.num_locked >= 1 and self.power_ups['key'].state == 0 then
+        self.power_ups['key'].state = 1
+        self.power_ups['key']:reset()
+        self.powerup_timer = 0
+        self.powerup_tick = 90
+    end
+
     if self.paused then
         if love.keyboard.wasPressed('space') then
             self.paused = false
@@ -86,7 +91,7 @@ function PlayState:update(dt)
     local locked=0
     -- detect collision across all bricks with the ball
     for k, brick in pairs(self.bricks) do
-        self.score,self.recoverPoints,self.health=self.balls:bricks(self.powerUps,brick,self.score,self.recoverPoints,self.health)
+        self.score,self.recoverPoints,self.health,self.num_locked=self.balls:bricks(self.power_ups,brick,self.score,self.recoverPoints,self.health,self.num_locked)
 
         if self:checkVictory() then
             gSounds['victory']:play()
@@ -118,7 +123,7 @@ function PlayState:update(dt)
             highScores = self.highScores,
             level = self.level,
             recoverPoints = self.recoverPoints,
-            powerups = self.powerUps
+            power_ups = self.power_ups
         })
         life_lost = false
     end
@@ -153,8 +158,8 @@ function PlayState:render()
     self.balls:render()
     renderScore(self.score)
     renderHealth(self.health)
-    for i,powerup in pairs(self.powerUps) do
-        self.powerUps[i]:render()
+    for i,powerup in pairs(self.power_ups) do
+        self.power_ups[i]:render()
     end
     -- pause text, if paused
     if self.paused then
