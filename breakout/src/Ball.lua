@@ -108,23 +108,16 @@ function MultiBall:add(number)
 
     if self.num_balls < 5 then
         local additional = math.min(number,(5 - self.num_balls))
-        self.num_balls = (additional-1) + self.num_balls
+        additional = self.num_balls + additional
         local x = self.balls[1].x
         local y = self.balls[1].y
-        for i=2,additional do
-            local dx = math.random(-100, 100)
-            local dy = math.random(-30, 30)
+        for i=self.num_balls,additional do
+            local dx = math.random(5, 100) * (math.random(2) == 1 and 1 or -1 )
+            local dy = math.random(3,30) * (math.random(2) == 1 and 1 or -1 )
             self.balls[i]=Ball(math.random(7),dx,dy,x,y)
-
         end
-        --printf("num_balls:%d\n #self.balls:%d\n",self.num_balls,#self.balls)
-        --for k,v in pairs(self.balls) do
-        --    printf("ball #%s\n",k)
-        --    for k,v in pairs(v) do
-        --        printf("k:%s v:%s\n",k,v)
-        --    end
-        --    printf("\n\n")
-        --end
+
+        self.num_balls = additional
     end
 end
 
@@ -144,8 +137,8 @@ end
 function MultiBall:spawn()
     -- give ball random starting velocity
     for _,ball in pairs(self.balls) do
-        ball.dx = math.random(-200, 200)
-        ball.dy = math.random(-50, -60)
+        ball.dx = math.random(30,200) * (math.random(2) == 1 and -1 or 1)
+        ball.dy = math.random(10,60) * (math.random(2) == 1 and -1 or 1)
     end
 end
 function MultiBall:paddle_collision(paddle)
@@ -210,7 +203,7 @@ function MultiBall:lives(health)
 
 end
 
-function MultiBall:bricks(power_ups,brick,score,recoverPoints,health,num_locked)
+function MultiBall:bricks(power_ups,brick,score,recoverPoints,health,num_locked,level)
     local locked = false
     local num_unlocked = 0
     --for i=1,self.num_balls do
@@ -221,16 +214,23 @@ function MultiBall:bricks(power_ups,brick,score,recoverPoints,health,num_locked)
 
             -- add to score
             if brick.locked == nil then
-                score = score + (brick.tier * 200 + brick.color * 25)
+                score = score + math.floor((brick.tier+level/15) * 200 + (brick.color+level/15) * 25)
             elseif brick.locked == false then
-                score = score + 100 + math.floor(score * 0.15)
+                score = score + math.floor(100 + ((brick.tier+level/15) * 200 + (brick.color+level/15) * 25) + math.floor(score * 0.05))
             end
 
             -- trigger the brick's hit function, which removes it from play
             locked = brick:hit(power_ups,num_locked)
             if locked then
-                power_ups['key'].state = 0
-                num_locked = num_locked  > 0 and num_locked -1 or num_locked
+                for _,power_up in pairs(power_ups) do
+                    if power_up.type == 5 then
+                        power_up.state = 0
+                        num_locked = num_locked > 0 and num_locked - 1 or num_locked
+                        break
+                    end
+                end
+                --power_ups['key'].state = 0
+                --num_locked = num_locked  > 0 and num_locked -1 or num_locked
             end
 
             -- if we have enough points, recover a point of health

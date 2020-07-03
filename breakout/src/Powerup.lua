@@ -125,5 +125,6 @@ function LifePowerUp(brick,dy,paddle)
 end
 
 function addLives(health)
+    print(health)
     return health <= 4 and health +1 or health
 end

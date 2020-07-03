@@ -40,10 +40,13 @@ function LevelMaker.createMap(level)
     }
 
     -- randomly choose the number of rows
-    local numRows = math.random(1, 3)
-
+    local numRows = math.random(1, 5)
+    if level == 1 then
+        numRows = 2
+    end
     -- randomly choose the number of columns, ensuring odd
-    local numCols = math.random(7, 9)
+    local numCols = math.random(7, 13)
+    
     numCols = numCols % 2 == 0 and (numCols + 1) or numCols
 
     -- highest possible spawned brick color in this level; ensure we
@@ -51,8 +54,9 @@ function LevelMaker.createMap(level)
     local highestTier = math.min(3, math.floor(level / 5))
 
     -- highest color of the highest tier, no higher than 5
-    --local highestColor = math.min(5, level % 5 + 3)
-    local highestColor = 3
+    local highestColor = math.min(5, math.floor(level/2+1))
+
+    --local highestColor = 3
     local locked = false
     -- Basically we make a number between 1 and this number and if it is that number then we make the brick contain
     -- a powerup. Except level 1. Level 1 _always_ has a locked brick and a key powerup.PowerUp
@@ -109,10 +113,10 @@ function LevelMaker.createMap(level)
                 + (13 - numCols) * 16,  -- left-side padding for when there are fewer than 13 columns
                 
                 -- y-coordinate
-                y * 16                  -- just use y * 16, since we need top padding anyway
+                    (y*16)+3    -- Using (y*16)+3 to have extra padding around the powerup itself to make it look cleaner.
             )
 
-            if math.random(6) == 6 then
+            if math.random(powerup_min) == powerup_min then
                 check = math.random(100)
                 if check <= 30 then
                     PowerUps[total_powerups] = PowerUpLUT[1](b)
@@ -184,6 +188,7 @@ function LevelMaker.createMap(level)
         PowerUps[total_powerups+3] = PowerUpLUT[3](bricks[num_bricks -2],50)
         bricks[num_bricks - 3].powerup = total_powerups+2
         bricks[num_bricks - 4].powerup = total_powerups+3
+
     end
 
     -- in the event we didn't generate any bricks, try again
