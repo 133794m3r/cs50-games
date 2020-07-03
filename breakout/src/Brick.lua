@@ -94,14 +94,14 @@ function Brick:init(x, y)
 	self.width = 32
 	self.height = 16
 	-- if the brick is locked then it's sprite will be swapped with the "lock" brick sprite.
-	self.locked = false
+	self.locked = nil
 	-- used to determine whether this brick should be rendered
 	self.inPlay = true
 
 	-- whether they have collected any powerup that it might have
 	self.powerup_collected = false
 	-- what the id is for the powerup
-	self.powerup = nil
+	self.powerup = false
 
 	-- particle system belonging to the brick, emitted on hit
 	self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)
@@ -135,7 +135,7 @@ function Brick:hit(power_ups,num_locked)
 	gSounds['brick-hit-2']:stop()
 	gSounds['brick-hit-2']:play()
 
-	if not self.locked then
+	if self.locked  ~= true then
 		-- set the particle system to interpolate between two colors; in this case, we give
 		-- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
 		-- over the particle's lifetime (the second color)
@@ -163,11 +163,23 @@ function Brick:hit(power_ups,num_locked)
 			-- if we're in the first tier and the base color, remove brick from play
 			if self.color == 1 then
 				self.inPlay = false
-                if self.powerup ~= nil then
+                if self.powerup ~= nil and self.powerup ~= false then
+					print('pu',self.powerup)
+					if type(self.powerup) == 'table' then
+						for k,v in pairs(self.powerup) do
+							print('k',k,'v',v)
+						end
+
+					end
+
+					for k,v in pairs(power_ups) do
+						printf("K:%s type:%d\n",k,v.type)
+
+					end
                     self.powerup_collected = true
 					if self.powerup == 'key' and  num_locked >= 1 then
 						power_ups[self.powerup].state = 1
-					else
+					elseif self.powerup ~= false then
 						power_ups[self.powerup].state  = 1
 					end
                 end
@@ -204,6 +216,12 @@ function Brick:render()
 			-- multiply color by 4 (-1) to get our color offset, then add tier to that
 			-- to draw the correct tier and color brick onto the screen
 					gFrames['bricks'][22],
+					self.x, self.y)
+		elseif self.locked == false then
+			love.graphics.draw(gTextures['main'],
+			-- multiply color by 4 (-1) to get our color offset, then add tier to that
+			-- to draw the correct tier and color brick onto the screen
+					gFrames['bricks'][21],
 					self.x, self.y)
 		else
 			love.graphics.draw(gTextures['main'],

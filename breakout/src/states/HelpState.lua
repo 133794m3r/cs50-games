@@ -31,6 +31,14 @@ HelpState = Class{__includes = BaseState}
 function HelpState:enter(params)
 	self.highScores = params.highScores
 end
+
+function HelpState:update(dt)
+	if love.keyboard.wasPressed('escape') or love.keyboard.wasPressed('enter') then
+		gStateMachine:change('start',{
+			highScores = self.highScores
+		})
+	end
+end
 -- Each character takes ~height*1.5(or there abouts) in width.
 function HelpState:render()
 	love.setColor(255,255,255,255)
@@ -38,11 +46,19 @@ function HelpState:render()
 	love.graphics.printf('Breakout Help Screen',0, 5,VIRTUAL_WIDTH,'center')
 	love.graphics.setFont(gFonts['medium'])
 	love.graphics.printf('Hit escape to go back to the main menu.',0,40,VIRTUAL_WIDTH,'center')
+	-- PowerUps/Icons section
 	love.graphics.print('Key',15,75)
 	love.graphics.draw(gTextures['main'], gFrames['powerups'][10], 50, 75)
 	love.graphics.print('MultiBall',150,75)
 	love.graphics.draw(gTextures['main'],gFrames['powerups'][9],222,75)
+	love.graphics.print('PaddleGrow',15,120)
+	love.graphics.draw(gTextures['main'],gFrames['powerups'][5],115,120)
+	love.graphics.print("ExtraLife",280,120)
+	love.graphics.draw(gTextures['main'],gFrames['powerups'][3],356,120)
+	-- details section
 	love.graphics.setFont(gFonts['small'])
-	love.graphics.print("Unlocks locked brick.",15,91)
-	love.graphics.print("Adds 2 more balls (up to 5) to the field.",150,91)
+	love.graphics.print("Unlocks locked brick.",15,93)
+	love.graphics.print("Adds 2 more balls (up to 5) to the field.",150,93)
+	love.graphics.print("Increases the paddle size up to max size for 30s",15,138)
+	love.graphics.print("Adds an extra life, If total < 5",280,138)
 end

@@ -118,5 +118,12 @@ function GluePowerUp(brick,dy,paddle)
     return PowerUp(8,0,brick,paddle,dy)
 end
 function GrowPowerUp(brick,dy,paddle)
-    return PowerUp(5,120,brick,paddle,dy)
+    return PowerUp(5,30,brick,paddle,dy)
+end
+function LifePowerUp(brick,dy,paddle)
+    return PowerUp(3,0,brick,paddle,dy)
+end
+
+function addLives(health)
+    return health <= 4 and health +1 or health
 end

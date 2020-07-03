@@ -277,7 +277,7 @@ end
 ]]
 function renderHealth(health)
     -- start of our health rendering
-    local healthX = VIRTUAL_WIDTH - 100
+    local healthX = VIRTUAL_WIDTH - 120
     --print("health",health)
     --printf('health %d\n',health)
     -- render health left

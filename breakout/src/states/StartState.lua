@@ -18,7 +18,7 @@
 StartState = Class{__includes = BaseState}
 
 -- whether we're highlighting "Start" or "High Scores"
-local highlighted = 3
+local highlighted = 1
 
 function StartState:enter(params)
     self.highScores = params.highScores

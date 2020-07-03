@@ -224,8 +224,10 @@ function MultiBall:bricks(power_ups,brick,score,recoverPoints,health,num_locked)
         if brick.inPlay and ball:collides(brick) then
 
             -- add to score
-            if brick.locked == false then
+            if brick.locked == nil then
                 score = score + (brick.tier * 200 + brick.color * 25)
+            elseif brick.locked == false then
+                score = score + 100 + math.floor(score * 0.15)
             end
 
             -- trigger the brick's hit function, which removes it from play

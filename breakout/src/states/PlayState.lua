@@ -61,6 +61,9 @@ function PlayState:update(dt)
                 if self.power_ups[i].type == 9 then
                     self.balls:add(3)
                     self.power_ups[i].state = 0
+                elseif self.power_ups[i].type == 3 then
+                    self.health = addLives(self.health)
+                    self.power_ups[i].state = 0
                 end
             end
 
@@ -128,6 +131,7 @@ function PlayState:update(dt)
             highScores = self.highScores,
             level = self.level,
             recoverPoints = self.recoverPoints,
+            num_locked = self.num_locked,
             power_ups = self.power_ups
         })
         life_lost = false
