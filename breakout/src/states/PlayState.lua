@@ -30,7 +30,6 @@ function PlayState:enter(params)
     self.balls = params.balls
     self.level = params.level
     self.num_locked = params.num_locked
-    print('num_locked',params.num_locked)
     self.power_ups = params.power_ups
     self.recoverPoints = 5000
     self.powerup_tick = 20

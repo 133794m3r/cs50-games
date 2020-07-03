@@ -129,7 +129,6 @@ function MultiBall:add(number)
 end
 
 function MultiBall:track(paddle)
-    printf("%d\n",self.balls)
     for _,ball in pairs(self.balls) do
         ball.x = paddle.x + (paddle.width / 2) - 4
         ball.y = paddle.y - 8
@@ -195,11 +194,8 @@ function MultiBall:lives(health)
 
         -- if ball goes below bounds, revert to serve state and decrease health
         if ball.y >= VIRTUAL_HEIGHT then
-            print(#self.balls)
-            print('nb',self.num_balls)
             table.remove(self.balls,i)
             self.num_balls = self.num_balls - 1
-            print("nb2",self.num_balls)
             if self.num_balls <= 0 then
                 health = health - 1
                 gSounds['hurt']:play()

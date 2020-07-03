@@ -164,18 +164,6 @@ function Brick:hit(power_ups,num_locked)
 			if self.color == 1 then
 				self.inPlay = false
                 if self.powerup ~= nil and self.powerup ~= false then
-					print('pu',self.powerup)
-					if type(self.powerup) == 'table' then
-						for k,v in pairs(self.powerup) do
-							print('k',k,'v',v)
-						end
-
-					end
-
-					for k,v in pairs(power_ups) do
-						printf("K:%s type:%d\n",k,v.type)
-
-					end
                     self.powerup_collected = true
 					if self.powerup == 'key' and  num_locked >= 1 then
 						power_ups[self.powerup].state = 1
@@ -195,9 +183,8 @@ function Brick:hit(power_ups,num_locked)
 			gSounds['brick-hit-1']:play()
 		end
 	else
-		print('key state',power_ups['key'].state)
+
 		if power_ups['key'].state == 2 then
-			print('locked')
 			self.locked = false
             return true
 		end
