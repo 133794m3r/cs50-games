@@ -309,11 +309,11 @@ end
 function displayPowerUPs(power_ups)
     love.graphics.setFont(gFonts['small'])
     love.setColor(255,255,255)
-    love.graphics.print('Power UPs',0,5)
-    local x = 48
+    love.graphics.print('Power UP',3,5)
+    local x = 0
     for _,power_up in pairs(power_ups) do
         if power_up.state == 2 then
-            love.graphics.draw(gTextures['main'], gFrames['powerups'][power_up.type], x, 1,0,1,1)
+            love.graphics.draw(gTextures['main'], gFrames['powerups'][power_up.type], x, 15,0,1,1)
             x = x + 16
         end
     end

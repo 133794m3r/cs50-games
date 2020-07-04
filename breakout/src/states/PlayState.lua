@@ -61,13 +61,11 @@ function PlayState:update(dt)
                     self.balls:add(3)
                     self.power_ups[i].state = 0
                 elseif self.power_ups[i].type == 3 then
-                    print('lives',self.health)
                     self.health = addLives(self.health)
-                    self.power_ups[i].state = 0
-                elseif self.power_ups[i].type == 10 and self.num_locked == 0 then
                     self.power_ups[i].state = 0
                 end
             end
+
         end
 
     end
@@ -100,7 +98,7 @@ function PlayState:update(dt)
     local locked=0
     -- detect collision across all bricks with the ball
     for k, brick in pairs(self.bricks) do
-        self.score,self.recoverPoints,self.health,self.num_locked=self.balls:bricks(self.power_ups,brick,self.score,self.recoverPoints,self.health,self.num_locked,self.level)
+        self.score,self.recoverPoints,self.health,self.num_locked=self.balls:bricks(self.power_ups,brick,self.score,self.recoverPoints,self.health,self.num_locked)
 
         if self:checkVictory() then
             gSounds['victory']:play()

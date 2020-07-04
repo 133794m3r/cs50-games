@@ -183,16 +183,14 @@ function Brick:hit(power_ups,num_locked)
 			gSounds['brick-hit-1']:play()
 		end
 	else
-		for _,power_up in pairs(power_ups) do
-			if power_up.state == 2 and power_up.type == 10 then
-				self.locked = false
-				return true
-			end
+
+		if power_ups['key'].state == 2 then
+			self.locked = false
+            return true
 		end
 	end
 
 end
-
 
 function Brick:update(dt)
 	self.psystem:update(dt)
