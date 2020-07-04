@@ -53,6 +53,9 @@ function PlayState:init()
             gSounds['clock']:play()
         end
     end)
+    --self.ShinyTimer = Timer.every(1/144,function()
+    --    self.board:renderShinies()
+    --end)
 end
 
 function PlayState:enter(params)
@@ -61,7 +64,7 @@ function PlayState:enter(params)
     self.level = params.level
 
     -- spawn a board and place it toward the right
-    self.board = params.board or Board(VIRTUAL_WIDTH - 272, 16)
+    self.board = params.board or Board(VIRTUAL_WIDTH - 272, 16,self.level)
 
     -- grab score from params if it was passed
     self.score = params.score or 0
@@ -142,7 +145,9 @@ function PlayState:update(dt)
                 gSounds['error']:play()
                 self.highlightedTile = nil
             else
-                
+                --printf("highlight: x=%d,y=%d swap: x=%d,y=%d\n",self.highlightedTile.gridX,self.highlightedTile.gridY,x,y,self.highlightedTile)
+                --print_r(self.board.tiles[y][x])
+                --print_r(self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX])
                 -- swap grid positions of tiles
                 local tempX = self.highlightedTile.gridX
                 local tempY = self.highlightedTile.gridY
@@ -193,13 +198,9 @@ function PlayState:calculateMatches()
         gSounds['match']:stop()
         gSounds['match']:play()
 
-        -- add score for each match
-        for k, match in pairs(matches) do
-            self.score = self.score + #match * 50
-        end
-
+        self.score = self.board:scoreMatches(self.score)
         -- add to the timer the number of matched tiles.
-        sel.timer = self.timer + #matches
+        self.timer = self.timer + #matches
 
         -- remove any tiles that matched from the board, making empty spaces
         self.board:removeMatches()
@@ -232,7 +233,7 @@ function PlayState:render()
         -- multiply so drawing white rect makes it brighter
         love.graphics.setBlendMode('add')
 
-        love.graphics.setColor(255, 255, 255, 96)
+        love.setColor(255, 255, 255, 96)
         love.graphics.rectangle('fill', (self.highlightedTile.gridX - 1) * 32 + (VIRTUAL_WIDTH - 272),
             (self.highlightedTile.gridY - 1) * 32 + 16, 32, 32, 4)
 
@@ -242,9 +243,9 @@ function PlayState:render()
 
     -- render highlight rect color based on timer
     if self.rectHighlighted then
-        love.graphics.setColor(217, 87, 99, 255)
+        love.setColor(217, 87, 99, 255)
     else
-        love.graphics.setColor(172, 50, 50, 255)
+        love.setColor(172, 50, 50, 255)
     end
 
     -- draw actual cursor rect
@@ -253,10 +254,10 @@ function PlayState:render()
         self.boardHighlightY * 32 + 16, 32, 32, 4)
 
     -- GUI text
-    love.graphics.setColor(56, 56, 56, 234)
+    love.setColor(56, 56, 56, 234)
     love.graphics.rectangle('fill', 16, 16, 186, 116, 4)
 
-    love.graphics.setColor(99, 155, 255, 255)
+    love.setColor(99, 155, 255, 255)
     love.graphics.setFont(gFonts['medium'])
     love.graphics.printf('Level: ' .. tostring(self.level), 20, 24, 182, 'center')
     love.graphics.printf('Score: ' .. tostring(self.score), 20, 52, 182, 'center')

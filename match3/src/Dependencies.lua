@@ -39,19 +39,32 @@ require 'src/states/BeginGameState'
 require 'src/states/GameOverState'
 require 'src/states/PlayState'
 require 'src/states/StartState'
-
-gSounds = {
-    ['music'] = love.audio.newSource('sounds/music3.mp3'),
-    ['select'] = love.audio.newSource('sounds/select.wav'),
-    ['error'] = love.audio.newSource('sounds/error.wav'),
-    ['match'] = love.audio.newSource('sounds/match.wav'),
-    ['clock'] = love.audio.newSource('sounds/clock.wav'),
-    ['game-over'] = love.audio.newSource('sounds/game-over.wav'),
-    ['next-level'] = love.audio.newSource('sounds/next-level.wav')
-}
+-- love11 doesn't support creating a new audio source w/o the type being specified.
+if LOVE_VERSION_11 then
+    gSounds = {
+        ['music'] = love.audio.newSource('sounds/music3.mp3','stream'),
+        ['select'] = love.audio.newSource('sounds/select.wav','static'),
+        ['error'] = love.audio.newSource('sounds/error.wav','static'),
+        ['match'] = love.audio.newSource('sounds/match.wav','static'),
+        ['clock'] = love.audio.newSource('sounds/clock.wav','static'),
+        ['game-over'] = love.audio.newSource('sounds/game-over.wav','static'),
+        ['next-level'] = love.audio.newSource('sounds/next-level.wav','static')
+    }
+else
+    gSounds = {
+        ['music'] = love.audio.newSource('sounds/music3.mp3'),
+        ['select'] = love.audio.newSource('sounds/select.wav'),
+        ['error'] = love.audio.newSource('sounds/error.wav'),
+        ['match'] = love.audio.newSource('sounds/match.wav'),
+        ['clock'] = love.audio.newSource('sounds/clock.wav'),
+        ['game-over'] = love.audio.newSource('sounds/game-over.wav'),
+        ['next-level'] = love.audio.newSource('sounds/next-level.wav')
+    }
+end
 
 gTextures = {
-    ['main'] = love.graphics.newImage('graphics/match3.png'),
+    --['main'] = love.graphics.newImage('graphics/match3.png'),
+    ['main'] = love.graphics.newImage('graphics/match3b.png'),
     ['background'] = love.graphics.newImage('graphics/background.png')
 }
 
