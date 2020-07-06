@@ -98,9 +98,8 @@ function love.keyboard.wasPressed(key)
         return false
     end
 end
-NEXT_TIME = love.timer.getTime()
+
 function love.update(dt)
-    NEXT_TIME = NEXT_TIME + 1/60
     -- scroll background, used across all states
     backgroundX = backgroundX - BACKGROUND_SCROLL_SPEED * dt
     
@@ -115,19 +114,12 @@ function love.update(dt)
 end
 
 function love.draw()
-    --
-    --local cur_time = love.timer.getTime()
-    --if NEXT_TIME <= cur_time then
-    --    NEXT_TIME = cur_time
-    --    return
-    --end
     push:start()
     -- scrolling background drawn behind every state
     love.graphics.draw(gTextures['background'], backgroundX, 0)
 
     gStateMachine:render()
     --fps_counter()
-    --love.timer.sleep(NEXT_TIME - cur_time)
     push:finish()
 end
 

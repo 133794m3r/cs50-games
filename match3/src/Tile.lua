@@ -4,8 +4,8 @@
 
     -- Tile Class --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Authors: Colton Ogden, Macarthur Inbody
+    cogden@cs50.harvard.edu, admin-contact@transcendental.us
 
     The individual tiles that make up our game board. Each Tile can have a
     color and a variety, with the varietes adding extra points to the matches.
@@ -43,20 +43,9 @@ function Tile:render(x, y)
     self.x + x, self.y + y)
     love.graphics.setColor(255,255,0,255)
     if self.shiny then
-        --love.graphics.setLineWidth(1)
-        --love.graphics.line(self.x+x+2,self.y+y+16,self.x+x+28,self.y+y+16)
-        --love.setColor(255,255,255,255)
+        -- the "shine" sprite denoting it as 'shiny' is drawn.
         love.graphics.draw(gTextures['shine'],self.x+x+2,self.y+y+2,0,0.2,0.2)
-        --love.graphics.draw(gTextures['shine'],self.x+x+16,self.y+y+16,0,0.2,0.2)
     end
+    -- reset the colors.
     love.setColor(255,255,255,255)
-end
-
-function Tile:renderShine()
-    if self.shiny then
-        print('shiny')
-        --love.graphics.setBackgroundColor(0,0,0)
-        love.graphics.draw(gTextures['shine'],0,0,0,4,4)
-        love.graphics.draw(self.psystem, 10, 10)
-    end
 end

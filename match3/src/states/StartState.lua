@@ -4,8 +4,8 @@
 
     -- StartState Class --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Author: Colton Ogden, Macarthur Inbody
+    cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
     Represents the state the game is in when we've just started; should
     simply display "Match-3" in large text, as well as a message to press
@@ -128,7 +128,6 @@ function StartState:render()
                 (x - 1) * 32 + 128 + 3, (y - 1) * 32 + 16 + 3)
 
             -- render tile
-            --love.graphics.setColor(255, 255, 255, 255)
             love.setColor(255,255,255,255)
             love.graphics.draw(gTextures['main'], positions[(y - 1) * x + x],
                 (x - 1) * 32 + 128, (y - 1) * 32 + 16)

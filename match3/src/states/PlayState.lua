@@ -4,8 +4,8 @@
 
     -- PlayState Class --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Authors: Colton Ogden, Macarthur Inbody
+    cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
     State in which we can actually play, moving around a grid cursor that
     can swap two tiles; when two tiles make a legal swap (a swap that results

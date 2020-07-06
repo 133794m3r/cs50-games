@@ -4,8 +4,8 @@
 
     -- BeginGameState Class --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Authors: Colton Ogden, Macarthur Inbody
+    cogden@cs50.harvard.edu, admin-contact@transcendental.us
 
     Represents the state the game is in right before we start playing;
     should fade in, display a drop-down "Level X" message, then transition
@@ -32,11 +32,9 @@ function BeginGameState:enter(def)
     self.level = def.level
     self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level,def.no_moves)
     if def.no_moves == true then
-        print(self.board:checkBoard())
         while self.board:checkBoard() do
             self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level,def.no_moves)
         end
-        print(self.board:checkBoard())
     end
     if self.level <= 4 then
         self.board.tiles[math.random(8)][math.random(8)].shiny = true

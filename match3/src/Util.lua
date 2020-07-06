@@ -4,8 +4,8 @@
 
     -- StartState Class --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Author: Colton Ogden,Macarthur Inbody
+    cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
     Helper functions for writing Match-3.
 ]]
