@@ -30,8 +30,15 @@ function BeginGameState:enter(def)
     
     -- grab level # from the def we're passed
     self.level = def.level
-    print(self.level)
-    self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level)
+    self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level,def.no_moves)
+    if def.no_moves == true then
+        while self.board:checkBoard() do
+            self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level,def.no_moves)
+        end
+    end
+    if self.level <= 4 then
+        self.board.tiles[math.random(8)][math.random(8)].shiny = true
+    end
     --
     -- animate our white screen fade-in, then animate a drop-down with
     -- the level text
@@ -39,35 +46,35 @@ function BeginGameState:enter(def)
 
     -- first, over a period of 1 second, transition our alpha to 0
     Timer.tween(1, {
-        [self] = {transitionAlpha = 0}
+    [self] = {transitionAlpha = 0}
     })
     -- once that's finished, start a transition of our text label to
     -- the center of the screen over 0.25 seconds
     :finish(function()
-        Timer.tween(0.25, {
-            [self] = {levelLabelY = VIRTUAL_HEIGHT / 2 - 8}
-        })
-        
-        -- after that, pause for one second with Timer.after
-        :finish(function()
-            Timer.after(0.5, function()
-                
-                -- then, animate the label going down past the bottom edge
-                Timer.tween(0.25, {
-                    [self] = {levelLabelY = VIRTUAL_HEIGHT + 30}
-                })
-                
-                -- once that's complete, we're ready to play!
-                :finish(function()
-                    gStateMachine:change('play', {
-                        level = self.level,
-                        board = self.board
-                    })
-                end)
-            end)
+    Timer.tween(0.25, {
+    [self] = {levelLabelY = VIRTUAL_HEIGHT / 2 - 8}
+    })
+
+    -- after that, pause for one second with Timer.after
+    :finish(function()
+    Timer.after(0.5, function()
+
+    -- then, animate the label going down past the bottom edge
+    Timer.tween(0.25, {
+    [self] = {levelLabelY = VIRTUAL_HEIGHT + 30}
+    })
+
+    -- once that's complete, we're ready to play!
+    :finish(function()
+    gStateMachine:change('play', {
+    level = self.level,
+    board = self.board
+    })
         end)
-    end)
-end
+        end)
+        end)
+        end)
+        end
 
 function BeginGameState:update(dt)
     Timer.update(dt)

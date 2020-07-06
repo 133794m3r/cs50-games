@@ -126,7 +126,7 @@ function love.draw()
     love.graphics.draw(gTextures['background'], backgroundX, 0)
 
     gStateMachine:render()
-    fps_counter()
+    --fps_counter()
     --love.timer.sleep(NEXT_TIME - cur_time)
     push:finish()
 end

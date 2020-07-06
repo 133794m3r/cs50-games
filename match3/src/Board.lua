@@ -13,24 +13,33 @@
 
 Board = Class{}
 
-function Board:init(x, y,level)
+function Board:init(x, y,level,no_moves)
     self.x = x
     self.y = y
     self.matches = {}
+    self.totalMatches = 0
     self.level = level
     --self.max_color = math.min(12,math.round((self.level / 5)* 12 ))
-    self.max_color = math.min(12,math.floor(self.level+1/3)+4)
+    if no_moves then
+        self.max_color = 12
+    else
+        self.max_color = math.min(12,math.floor(self.level+1/2)+4)
+
+    end
+    --self.max_color  = 11
     self.max_pattern = math.min(6,math.floor(self.level / 2))
     --self.max_pattern = 6
     self:initializeTiles()
+    self.shinies = 0
 end
 
 function Board:initializeTiles()
     self.tiles = {}
     local shinies = 0
-
+    local continuing=false
     local shiny = false
-    local shiny_chance = level == 1 and 1 or 50
+    local shiny_chance = level == 1 and 10 or 25
+
     local shiny_roll = 0
     for tileY = 1, 8 do
 
@@ -49,13 +58,18 @@ function Board:initializeTiles()
             end
         end
 
-    while self:calculateMatches() do
+    --while self:calculateMatches() do
+    while self:validMove() do
         -- recursively initialize if matches were returned so we always have
         -- a matchless board on start
+        shinies = 0
         self:initializeTiles()
 
     end
-    self.tiles[2][1].shiny = true
+
+    if self.level <= 4  and shinies == 0 then
+        self.tiles[math.random(2,3)][math.random(1,2)].shiny = true
+    end
 end
 --[[
     Goes left to right, top to bottom in the board, calculating matches by counting consecutive
@@ -67,6 +81,7 @@ function Board:calculateMatches()
 
     -- how many of the same color blocks in a row we've found
     local matchNum = 1
+    local totalMatchNum = 1
     local shinies = 0
     local shiny_col = false
     -- horizontal matches first
@@ -94,11 +109,11 @@ function Board:calculateMatches()
                 shiny_col = self.tiles[y][x].shiny
                 -- if we have a match of 3 or more up to now, add it to our matches table
                 if matchNum >= 3 then
-                    local match = {}
 
+                    totalMatchNum = totalMatchNum + 1
+                    local match = {}
                     -- go backwards from here by matchNum
                     for x2 = x - 1, x - matchNum, -1 do
-
                         -- add each tile to the match that's in that match
                         table.insert(match, self.tiles[y][x2])
                     end
@@ -120,6 +135,7 @@ function Board:calculateMatches()
         if matchNum >= 3 then
             local match = {}
 
+            totalMatchNum = totalMatchNum + 1
             -- go backwards from end of last row by matchNum
             for x = 8, 8 - matchNum + 1, -1 do
                 table.insert(match, self.tiles[y][x])
@@ -150,22 +166,27 @@ function Board:calculateMatches()
                 shiny_col = self.tiles[y][x].shiny
 
                 if matchNum >= 3 then
+
+                    totalMatchNum = totalMatchNum + 1
                     local match = {}
                     if matchNum  >= 8 then
-                        print('mn',matchNum)
+                        totalMatchNum = totalMatchNum + matchNum
                         for x2 = 1,8 do
-                            table.insert(match,self.tiles[y][x2])
+                            if x ~= x2 then
+                                table.insert(match,self.tiles[y][x2])
+                            end
                         end
                         matchNum = matchNum - 8
                     end
                     if matchNum >= 1 then
+
+                        if matchNum >= 9 then
+                            matchNum = matchNum - 8
+                        end
+
                         for y2 = y - 1, y - matchNum, -1 do
-                            if y2 >= 8  or y2 <= 0 then
-                                print(y2,matchNum)
-                            end
-                            if self.tiles[y2][x] == nil then
-                                print('tile')
-                                printf("x:%d,y:%d\n",x,y2)
+                            if y2 <= 0 then
+                                break;
                             end
                             table.insert(match, self.tiles[y2][x])
                         end
@@ -186,11 +207,32 @@ function Board:calculateMatches()
         -- account for the last column ending with a match
         if matchNum >= 3 then
             local match = {}
-
-            -- go backwards from end of last row by matchNum
-            for y = 8, 8 - matchNum + 1, -1 do
-                table.insert(match, self.tiles[y][x])
+            if matchNum  >= 8 then
+                totalMatchNum = totalMatchNum + 1
+                for x2 = 1,8 do
+                    if x ~= x2 then
+                        table.insert(match,self.tiles[y][x2])
+                    end
+                end
+                matchNum = matchNum - 8
             end
+            if matchNum >= 1 then
+
+                if matchNum >= 9 then
+                    matchNum = matchNum - 8
+                end
+
+                for y2 =8, 8 - matchNum + 1, -1 do
+                    if y2 <= 0 then
+                        break;
+                    end
+                    table.insert(match, self.tiles[y2][x])
+                end
+            end
+            -- go backwards from end of last row by matchNum
+            --for y = 8, 8 - matchNum + 1, -1 do
+            --    table.insert(match, self.tiles[y][x])
+            --end
 
             table.insert(matches, match)
         end
@@ -198,7 +240,7 @@ function Board:calculateMatches()
 
     -- store matches for later reference
     self.matches = matches
-
+    self.totalMatches = totalMatchNum
     -- return matches table if > 0, else just return false
     return #self.matches > 0 and self.matches or false
 end
@@ -224,7 +266,7 @@ end
 function Board:getFallingTiles()
     -- tween table, with tiles as keys and their x and y as the to values
     local tweens = {}
-
+    local shiny = false
     -- for each column, go up tile by tile till we hit a space
     for x = 1, 8 do
         local space = false
@@ -272,7 +314,7 @@ function Board:getFallingTiles()
             y = y - 1
         end
     end
-
+    local shiny_chance = level == 1 and 10 or 25
     -- create replacement tiles at the top of the screen
     for x = 1, 8 do
         for y = 8, 1, -1 do
@@ -280,9 +322,9 @@ function Board:getFallingTiles()
 
             -- if the tile is nil, we need to add a new one
             if not tile then
-
+                shiny = shiny_chance == math.random(shiny_chance) and true or false
                 -- new tile with random color and variety
-                local tile = Tile(x, y, math.random(self.max_color), math.random(self.max_pattern))
+                local tile = Tile(x, y, math.random(self.max_color), math.random(self.max_pattern),shiny)
                 tile.y = -32
                 self.tiles[y][x] = tile
 
@@ -305,20 +347,48 @@ function Board:render()
     end
 end
 
-function Board:scoreMatches(score)
+function Board:renderShinies()
+    for y = 1, #self.tiles do
+        for x = 1, #self.tiles[1] do
+            self.tiles[y][x]:renderShine(self.x, self.y)
+        end
+    end
+end
+function Board:addTime(time)
+    local bonus
+    for _,match in pairs(self.matches) do
+
+        bonus = 1.02+((4.0/ self.level) * 0.075)
+        time =time + bonus
+    end
+end
+function Board:scoreMatches(score,time)
+    -- also adds the time to the timer since we're already iterating over them. Shinies and higher variety add more time.
     -- add score for each match
+    local bonus = 0
+    local time_bonus = 1
+    local time_add = 1.02+((4.0/ self.level) * 0.075)
+    local chain_bonus =
+    (self.level / 4 * ((self.totalMatches - 1) * 0.0125))+1
+
     for _, match in pairs(self.matches) do
         for __,tile in pairs(match) do
             if tile.variety > 1 then
-                bonus = tile.variety / 3
+                bonus = 1 +tile.variety / 3
             else
-                bonus = 0
+                bonus = 1
             end
-            score = math.floor(score + (1+bonus) * 50)
+            if tile.shiny then
+                time_bonus = time_add + 0.125
+
+                bonus = bonus + 0.125
+            end
+            score = score + (bonus + (chain_bonus/2)) * 50
+            time = time + (time_bonus * ((bonus + chain_bonus)/4))
         end
         --self.score = self.score + #match * 50
     end
-    return score
+    return math.floor(score),math.floor(time)
 end
 
 function Board:checkBoard()
@@ -348,7 +418,7 @@ function Board:checkBoard()
             prev_tile
 
             tmp_tiles[newTile.gridY][newTile.gridX] = newTile
-            if self:validMoves2(tmp_tiles) then
+            if self:validMove2(tmp_tiles) then
                 return true
             end
             x2=x
@@ -377,7 +447,7 @@ function Board:checkBoard()
             prev_tile
 
             tmp_tiles[newTile.gridY][newTile.gridX] = newTile
-            if self:validMoves2(tmp_tiles) then
+            if self:validMove2(tmp_tiles) then
                 return true
             end
             x2=x
@@ -387,7 +457,7 @@ function Board:checkBoard()
     return false
 end
 
-function Board:validMoves2(tiles)
+function Board:validMove2(tiles)
     local matches = {}
 
     -- how many of the same color blocks in a row we've found
@@ -476,7 +546,7 @@ function Board:validMoves2(tiles)
     return false
 end
 
-function Board:validMoves()
+function Board:validMove()
     local matches = {}
 
     -- how many of the same color blocks in a row we've found

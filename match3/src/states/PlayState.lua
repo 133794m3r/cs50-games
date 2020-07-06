@@ -40,7 +40,7 @@ function PlayState:init()
 	self.timer = 60
 
 	-- For when there's no moves we'll render that text. Later I'll make it an actual state.
-	self.no_moves = true
+	--self.no_moves = true
 	-- set our Timer class to turn cursor highlight on and off
 	Timer.every(0.5, function()
 		self.rectHighlighted = not self.rectHighlighted
@@ -48,15 +48,17 @@ function PlayState:init()
 
 	-- subtract 1 from timer every second
 	Timer.every(1, function()
-		self.timer = self.timer - 1
+		if self.paused == false then
+			self.timer = self.timer - 1
+		end
 
 		-- play warning sound on timer if we get low
 		if self.timer <= 5 then
 			gSounds['clock']:play()
 		end
 	end)
-	--self.ShinyTimer = Timer.every(1/144,function()
-	--    self.board:renderShinies()
+	--Timer.every(1,function()
+	--	self.board:renderShinies()
 	--end)
 	self.no_moves_y = -64
 
@@ -130,7 +132,10 @@ function PlayState:update(dt)
 			self.boardHighlightX = math.min(7, self.boardHighlightX + 1)
 			gSounds['select']:play()
 		end
-
+		-- if we've pressed space pause/unpause the game.
+		if love.keyboard.wasPressed('space') then
+			self.paused = not self.paused
+		end
 		-- if we've pressed enter, to select or deselect a tile...
 		if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
 			self.moves = self.moves + 1
@@ -151,26 +156,21 @@ function PlayState:update(dt)
 				gSounds['error']:play()
 				self.highlightedTile = nil
 			else
-				--printf("highlight: x=%d,y=%d swap: x=%d,y=%d\n",self.highlightedTile.gridX,self.highlightedTile.gridY,x,y,self.highlightedTile)
-				--print_r(self.board.tiles[y][x])
-				--print_r(self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX])
 				-- swap grid positions of tiles
 				local tempX = self.highlightedTile.gridX
 				local tempY = self.highlightedTile.gridY
 
 				local newTile = self.board.tiles[y][x]
-
 				self.highlightedTile.gridX = newTile.gridX
 				self.highlightedTile.gridY = newTile.gridY
 				newTile.gridX = tempX
 				newTile.gridY = tempY
-
 				-- swap tiles in the tiles table
 				self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX] =
 				self.highlightedTile
 
 				self.board.tiles[newTile.gridY][newTile.gridX] = newTile
-				if self.board:validMoves() then
+				if self.board:validMove() then
 					-- tween coordinates between the two so they swap
 					Timer.tween(0.25, {
 						[self.highlightedTile] = {x = newTile.x, y = newTile.y},
@@ -185,26 +185,22 @@ function PlayState:update(dt)
 				else
 					gSounds['error']:play()
 					-- swap grid positions of tiles
+
 					tempX = self.highlightedTile.gridX
 					tempY = self.highlightedTile.gridY
-
-					newTile = self.board.tiles[y][x]
-
 					self.highlightedTile.gridX = newTile.gridX
 					self.highlightedTile.gridY = newTile.gridY
 					newTile.gridX = tempX
 					newTile.gridY = tempY
 					self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX] = self.highlightedTile
+
+					self.board.tiles[newTile.gridY][newTile.gridX] = newTile
 					self.highlightedTile = nil
 					self.canInput = true
 				end
-				if self.no_moves and not self.no_moves_flag then
-					self.no_moves_flag = true
-				end
-				if self.no_moves_flag then
-					self.no_moves_flag = false
+				if not self.board:checkBoard() then
 					self.canInput = false
-					if not self.board:checkBoard() then
+					self.no_moves = true
 					Timer.tween(0.5, {
 						[self] = {no_moves_y = VIRTUAL_HEIGHT / 2 - 8}
 					})
@@ -214,16 +210,14 @@ function PlayState:update(dt)
 								[self] = {no_moves_y = VIRTUAL_HEIGHT + 30}
 							})
 								:finish(function()
-
-									print('all_done')
+									self.board:initializeTiles()
 									self.no_moves = false
 									self.canInput = true
+									self.timer = self.timer + 5
 							end)
 
 						end)
 					end)
-
-					end
 
 				end
 			end
@@ -244,14 +238,14 @@ function PlayState:calculateMatches()
 
 	-- if we have any matches, remove them and tween the falling blocks that result
 	local matches = self.board:calculateMatches()
-
+	local bonus = 0
 	if matches then
 		gSounds['match']:stop()
 		gSounds['match']:play()
 
-		self.score = self.board:scoreMatches(self.score)
+		self.score,self.timer = self.board:scoreMatches(self.score,self.timer)
 		-- add to the timer the number of matched tiles.
-		self.timer = self.timer + #matches
+		--self.timer = self.board:addTime(self.timer)
 
 		-- remove any tiles that matched from the board, making empty spaces
 		self.board:removeMatches()
@@ -267,6 +261,7 @@ function PlayState:calculateMatches()
 			-- as a result of falling blocks once new blocks have finished falling
 			self:calculateMatches()
 		end)
+		love.graphics.clear()
 		-- if no matches, we can continue playing
 	else
 		self.canInput = true
@@ -314,6 +309,8 @@ function PlayState:render()
 	love.graphics.printf('Score: ' .. tostring(self.score), 20, 52, 182, 'center')
 	love.graphics.printf('Goal : ' .. tostring(self.scoreGoal), 20, 80, 182, 'center')
 	love.graphics.printf('Timer: ' .. tostring(self.timer), 20, 108, 182, 'center')
+
+	-- the no moves rectangle.
 	love.setColor(95, 205, 228, 200)
 	love.graphics.rectangle('fill', 0, self.no_moves_y - 8, VIRTUAL_WIDTH, 48)
 	love.setColor(255, 255, 255, 255)
@@ -321,4 +318,15 @@ function PlayState:render()
 	love.graphics.printf('No valid moves.',
 			0, self.no_moves_y, VIRTUAL_WIDTH, 'center')
 
+	-- the paused text screen.
+	if self.paused then
+		love.setColor(95, 205, 228, 200)
+		love.graphics.rectangle('fill', 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, 48)
+		love.setColor(255, 255, 255, 255)
+		love.graphics.setFont(gFonts['large'])
+		love.graphics.printf('Game Paused',
+				0, VIRTUAL_HEIGHT / 2 + 8
+		, VIRTUAL_WIDTH, 'center')
+
+	end
 end

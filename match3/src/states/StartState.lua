@@ -17,7 +17,8 @@ local positions = {}
 StartState = Class{__includes = BaseState}
 
 function StartState:init()
-    
+    -- This is just so that I can easily show it when there are no moves since I have the starting levels be easier.
+    self.no_moves = false
     -- currently selected menu item
     self.currentMenuItem = 1
 
@@ -80,7 +81,9 @@ function StartState:update(dt)
             self.currentMenuItem = self.currentMenuItem == 1 and 2 or 1
             gSounds['select']:play()
         end
-
+        if love.keyboard.wasPressed('d') then
+            self.no_moves = not self.no_moves
+        end
         -- switch to another state via one of the menu options
         if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
             if self.currentMenuItem == 1 then
@@ -91,9 +94,8 @@ function StartState:update(dt)
                     [self] = {transitionAlpha = 255}
                 }):finish(function()
                     gStateMachine:change('begin-game', {
-                        level = 1
-
-
+                        level = 1,
+                        no_moves = self.no_moves
                     })
 
                     -- remove color timer from Timer
@@ -134,10 +136,10 @@ function StartState:render()
     end
 
     -- keep the background and tiles a little darker than normal
-    --love.graphics.setColor(0, 0, 0, 128)
+    love.setColor(0, 0, 0, 128)
     --love.graphics.setColor(0,0,0,0.5)
-    --love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
-
+    love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+    love.setColor(255,255,255,255)
     self:drawMatch3Text(-60)
     self:drawOptions(12)
 
