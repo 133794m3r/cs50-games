@@ -27,6 +27,7 @@
     http://cpetry.github.io/TextureGenerator-Online/
 ]]
 
+--require("mobdebug").start()
 -- initialize our nearest-neighbor filter
 love.graphics.setDefaultFilter('nearest', 'nearest')
 
@@ -97,9 +98,9 @@ function love.keyboard.wasPressed(key)
         return false
     end
 end
-
+NEXT_TIME = love.timer.getTime()
 function love.update(dt)
-    
+    NEXT_TIME = NEXT_TIME + 1/60
     -- scroll background, used across all states
     backgroundX = backgroundX - BACKGROUND_SCROLL_SPEED * dt
     
@@ -114,11 +115,24 @@ function love.update(dt)
 end
 
 function love.draw()
+    --
+    --local cur_time = love.timer.getTime()
+    --if NEXT_TIME <= cur_time then
+    --    NEXT_TIME = cur_time
+    --    return
+    --end
     push:start()
-
     -- scrolling background drawn behind every state
     love.graphics.draw(gTextures['background'], backgroundX, 0)
-    
+
     gStateMachine:render()
+    fps_counter()
+    --love.timer.sleep(NEXT_TIME - cur_time)
     push:finish()
+end
+
+function fps_counter()
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.setColor(0,255,0,255)
+    love.graphics.print("FPS: " .. tostring(love.timer.getFPS()),10,10)
 end
