@@ -32,9 +32,11 @@ function BeginGameState:enter(def)
     self.level = def.level
     self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level,def.no_moves)
     if def.no_moves == true then
+        print(self.board:checkBoard())
         while self.board:checkBoard() do
             self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level,def.no_moves)
         end
+        print(self.board:checkBoard())
     end
     if self.level <= 4 then
         self.board.tiles[math.random(8)][math.random(8)].shiny = true

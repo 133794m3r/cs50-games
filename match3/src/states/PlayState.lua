@@ -38,7 +38,7 @@ function PlayState:init()
 
 	self.score = 0
 	self.timer = 60
-
+	self.paused = false
 	-- For when there's no moves we'll render that text. Later I'll make it an actual state.
 	--self.no_moves = true
 	-- set our Timer class to turn cursor highlight on and off
@@ -170,7 +170,9 @@ function PlayState:update(dt)
 				self.highlightedTile
 
 				self.board.tiles[newTile.gridY][newTile.gridX] = newTile
-				if self.board:validMove() then
+				--if self.board:validMove() then
+				if self.board:fastValid(newTile.gridX,newTile.gridY,self.highlightedTile.gridX,self.highlightedTile.gridY) then
+
 					-- tween coordinates between the two so they swap
 					Timer.tween(0.25, {
 						[self.highlightedTile] = {x = newTile.x, y = newTile.y},
