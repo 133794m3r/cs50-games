@@ -26,7 +26,7 @@ function Board:init(x, y,level,no_moves)
         self.max_color = math.min(14,math.floor(self.level/2)+4)
     end
     --self.max_color  = 11
-    self.max_pattern = math.min(6,math.floor(self.level / 2)+1)
+    self.max_pattern = math.min(6,math.floor(self.level/2)+1)
     --self.max_pattern = 6
     self:initializeTiles()
     self.shinies = 0

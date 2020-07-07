@@ -138,7 +138,11 @@ function PlayState:update(dt)
 			score = self.score
 		})
 	end
-
+	-- if we've pressed space pause/unpause the game.
+	if love.keyboard.wasPressed('space') then
+		self.paused = not self.paused
+		self.canInput = not self.canInput
+	end
 	if self.canInput then
 		-- move cursor around based on bounds of grid, playing sounds
 		if love.keyboard.wasPressed('up') then
@@ -154,11 +158,7 @@ function PlayState:update(dt)
 			self.boardHighlightX = math.min(7, self.boardHighlightX + 1)
 			gSounds['select']:play()
 		end
-		-- if we've pressed space pause/unpause the game.
-		if love.keyboard.wasPressed('space') then
-			self.paused = not self.paused
-			self.canInput = not self.canInput
-		end
+
 		-- if we've pressed enter, to select or deselect a tile...
 		if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return')  then
 			self.moves = self.moves + 1
