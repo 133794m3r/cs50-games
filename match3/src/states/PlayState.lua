@@ -80,6 +80,28 @@ function PlayState:enter(params,timer)
 
 	-- so that when I re-enter this state I can make sure that it works.
 	self.timer = timer ~= nil and timer or self.timer
+	if not self.board:checkBoard() then
+		self.canInput = false
+		self.no_moves = true
+		Timer.tween(0.5, {
+			[self] = {no_moves_y = VIRTUAL_HEIGHT / 2 - 8}
+		})
+			 :finish(function()
+			Timer.after(1,function()
+				Timer.tween(0.5,{
+					[self] = {no_moves_y = VIRTUAL_HEIGHT + 30}
+				})
+					 :finish(function()
+					self.board:initializeTiles()
+					self.no_moves = false
+					self.canInput = true
+					self.timer = self.timer + 5
+				end)
+
+			end)
+		end)
+
+	end
 end
 
 function PlayState:update(dt)
@@ -135,6 +157,7 @@ function PlayState:update(dt)
 		-- if we've pressed space pause/unpause the game.
 		if love.keyboard.wasPressed('space') then
 			self.paused = not self.paused
+			self.canInput = not self.canInput
 		end
 		-- if we've pressed enter, to select or deselect a tile...
 		if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
