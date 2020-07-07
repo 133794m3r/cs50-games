@@ -34,6 +34,8 @@ function BeginGameState:enter(def)
     if def.no_moves == true then
         while self.board:checkBoard() do
             self.board = Board(VIRTUAL_WIDTH - 272, 16,self.level,def.no_moves)
+            print(self.board:checkBoard())
+
         end
     end
     if self.level <= 4 then
