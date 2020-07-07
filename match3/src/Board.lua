@@ -360,9 +360,9 @@ function Board:scoreMatches(score,time)
     -- add score for each match
     local bonus = 0
     local time_bonus = 1
-    local time_add = 1.02+((4.0/ self.level) * 0.075)
-    local chain_bonus =
-    (self.level / 4 * ((self.totalMatches - 1) * 0.0125))+1
+    -- The assignment said to not give more than 1s but I did it during the code b/c I suck at the game.
+    --local time_add = 1+((4.0/ self.level) * 0.075)
+    local chain_bonus = (self.level / 4 * ((self.totalMatches - 1) * 0.0125))+1
 
     for _, match in pairs(self.matches) do
         for __,tile in pairs(match) do
@@ -377,11 +377,15 @@ function Board:scoreMatches(score,time)
                 bonus = bonus + 0.125
             end
             score = score + (bonus + (chain_bonus/2)) * 50
-            time = time + (time_bonus * ((bonus + chain_bonus)/4))
+            -- removing it from the play.
+            --time = time + (time_bonus * ((bonus + chain_bonus)/4))
         end
         --self.score = self.score + #match * 50
     end
-    return math.floor(score),math.floor(time)
+    --Adding the number of matches to the time.
+    time = time + #matches
+    --return math.floor(score),math.floor(time)
+    return math.floor(score),time
 end
 
 function Board:checkBoard()
