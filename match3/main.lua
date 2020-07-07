@@ -79,7 +79,7 @@ function love.load()
 
     -- initialize input table
     love.keyboard.keysPressed = {}
-    love.moose.buttonPressed = {}
+    love.mouse.buttonPressed = {}
 end
 
 function love.resize(w, h)
@@ -92,7 +92,7 @@ function love.keypressed(key)
     love.keyboard.keysPressed[key] = true
 end
 function love.mousepressed(x,y,button)
-    love.moose.buttonPressed[button] = {x,y}
+    love.mouse.buttonPressed[button] = {x,y}
 end
 function love.mouse.wasPressed(button)
     if love.mouse.buttonPressed[button] then
@@ -119,7 +119,7 @@ function love.update(dt)
     end
 
     gStateMachine:update(dt)
-    love.moose.buttonPressed = {}
+    love.mouse.buttonPressed = {}
     love.keyboard.keysPressed = {}
 end
 
