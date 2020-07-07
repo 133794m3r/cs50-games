@@ -232,6 +232,7 @@ function PlayState:update(dt)
 				if not self.board:checkBoard() then
 					self.canInput = false
 					self.no_moves = true
+					self.paused = true
 					Timer.tween(0.5, {
 						[self] = {no_moves_y = VIRTUAL_HEIGHT / 2 - 8}
 					})
@@ -244,7 +245,7 @@ function PlayState:update(dt)
 									self.board:initializeTiles()
 									self.no_moves = false
 									self.canInput = true
-									self.timer = self.timer + 5
+									self.paused = false
 							end)
 
 						end)

@@ -64,7 +64,7 @@ end
 
 gTextures = {
     --['main'] = love.graphics.newImage('graphics/match3.png'),
-    ['main'] = love.graphics.newImage('graphics/match3b.png'),
+    ['main'] = love.graphics.newImage('graphics/match3c.png'),
     ['background'] = love.graphics.newImage('graphics/background.png'),
     ['shine'] = love.graphics.newImage('graphics/shine2.png')
 }
