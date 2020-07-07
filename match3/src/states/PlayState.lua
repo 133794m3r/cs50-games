@@ -287,6 +287,29 @@ function PlayState:calculateMatches()
 			self:calculateMatches()
 		end)
 		love.graphics.clear()
+		-- after all matches are done make sure that there is a possible move.
+		if not self.board:checkBoard() then
+			self.canInput = false
+			self.no_moves = true
+			Timer.tween(0.5, {
+				[self] = {no_moves_y = VIRTUAL_HEIGHT / 2 - 8}
+			})
+				 :finish(function()
+				Timer.after(1,function()
+					Timer.tween(0.5,{
+						[self] = {no_moves_y = VIRTUAL_HEIGHT + 30}
+					})
+						 :finish(function()
+						self.board:initializeTiles()
+						self.no_moves = false
+						self.canInput = true
+						self.timer = self.timer + 5
+					end)
+
+				end)
+			end)
+
+		end
 		-- if no matches, we can continue playing
 	else
 		self.canInput = true
