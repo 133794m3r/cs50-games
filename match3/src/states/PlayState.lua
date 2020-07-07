@@ -160,8 +160,14 @@ function PlayState:update(dt)
 			self.canInput = not self.canInput
 		end
 		-- if we've pressed enter, to select or deselect a tile...
-		if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+		if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return')  then
 			self.moves = self.moves + 1
+			-- I'll do this sometime in the future but for now it's good enough.
+			--if love.mouse.wasPressed(1) then
+			--	local mx,my
+			--	mx,my = table.unpack(love.mouse.wasPressed(1))
+			--	mx,my = push:toGame(mx,my)
+			--end
 			-- if same tile as currently highlighted, deselect
 			local x = self.boardHighlightX + 1
 			local y = self.boardHighlightY + 1

@@ -79,6 +79,7 @@ function love.load()
 
     -- initialize input table
     love.keyboard.keysPressed = {}
+    love.moose.buttonPressed = {}
 end
 
 function love.resize(w, h)
@@ -90,7 +91,16 @@ function love.keypressed(key)
     -- add to our table of keys pressed this frame
     love.keyboard.keysPressed[key] = true
 end
-
+function love.mousepressed(x,y,button)
+    love.moose.buttonPressed[button] = {x,y}
+end
+function love.mouse.wasPressed(button)
+    if love.mouse.buttonPressed[button] then
+        return love.mouse.buttonPressed[button]
+    else
+        return false
+    end
+end
 function love.keyboard.wasPressed(key)
     if love.keyboard.keysPressed[key] then
         return true
@@ -109,7 +119,7 @@ function love.update(dt)
     end
 
     gStateMachine:update(dt)
-
+    love.moose.buttonPressed = {}
     love.keyboard.keysPressed = {}
 end
 
