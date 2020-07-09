@@ -69,7 +69,7 @@ local function new(class)
 
 	-- class implementation
 	class.__index = class
-	class.init    = class.init    or class[1] or function() end
+	class.init	= class.init	or class[1] or function() end
 	class.include = class.include or include
 	class.clone   = class.clone   or clone
 

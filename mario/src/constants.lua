@@ -1,13 +1,13 @@
 --[[
-    GD50
-    Super Mario Bros. Remake
+	GD50
+	Super Mario Bros. Remake
 
-    -- constants --
+	-- constants --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
-    Some global constants for our application.
+	Some global constants for our application.
 ]]
 
 -- size of our actual window
@@ -64,30 +64,41 @@ TILE_ID_GROUND = 3
 
 -- table of tiles that should trigger a collision
 COLLIDABLE_TILES = {
-    TILE_ID_GROUND
+	TILE_ID_GROUND
 }
 
 --
 -- game object IDs
 --
 BUSH_IDS = {
-    1, 2, 5, 6, 7
+	1, 2, 5, 6, 7
 }
 
 COIN_IDS = {
-    1, 2, 3
+	1, 2, 3
 }
 
 CRATES = {
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 }
 
 GEMS = {
-    1, 2, 3, 4, 5, 6, 7, 8
+	1, 2, 3, 4, 5, 6, 7, 8
 }
-
+KEYS = {
+	1,2,3,4
+}
+LOCKS = {
+	5,6,7,8
+}
+POLES = {
+	1,2,3,4,5,6
+}
+FLAGS = {
+	1,2,3,4,5,6,7,8,9
+}
 JUMP_BLOCKS = {}
 
 for i = 1, 30 do
-    table.insert(JUMP_BLOCKS, i)
+	table.insert(JUMP_BLOCKS, i)
 end
