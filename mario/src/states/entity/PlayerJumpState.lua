@@ -75,7 +75,7 @@ function PlayerJumpState:update(dt)
 				self.player.dy = 0
 				self.player:changeState('falling')
 			elseif object.consumable then
-				object.onConsume(self.player)
+				object.onConsume(self.player,object)
 				table.remove(self.player.level.objects, k)
 			elseif object.collidable then
 				object:onCollide(object,self.player)
@@ -86,8 +86,7 @@ function PlayerJumpState:update(dt)
 	-- check if we've collided with any entities and die if so
 	for k, entity in pairs(self.player.level.entities) do
 		if entity:collides(self.player) then
-			--gSounds['death']:play()
-			--gStateMachine:change('start')
+			self.player:lifeLost()
 		end
 	end
 end

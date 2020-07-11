@@ -35,20 +35,22 @@ function PlayerLives:update(dt)
 	end
 end
 
-function PlayerLives:render()
+function PlayerLives:render(x,y)
+	x = x == nil and 85 or x
+	y = y == nil and 5 or y
 	--love.graphics.draw(gTextures['green-alien'],gFrames['green-alien-heads'][1],55,3,0,1,1)
 	love.graphics.setFont(gFonts['small'])
 	love.setColor(0, 0, 0, 255)
-	love.graphics.print(tostring(self.player.lives), 85, 5)
+	love.graphics.print(tostring(self.player.lives), x, y-1)
 	love.setColor(255, 255, 255, 255)
-	love.graphics.print(tostring(self.player.lives), 84, 4)
+	love.graphics.print(tostring(self.player.lives), x, y)
 
 	--love.graphics.setFont(gFonts['medium'])
 	love.setColor(0,0,0,255)
-	love.graphics.print('x',80,5)
+	love.graphics.print('x',x-9,y-1)
 	love.setColor(255,255,255,255)
-	love.graphics.print('x',80,4)
+	love.graphics.print('x',x-10,y)
 	love.graphics.draw(gTextures[self.atlas],
 			gFrames[self.texture][self.currentAnimation:getCurrentFrame()],
-			70, 10, 0, self.direction == 1 and 1 or -1, 1, 8, 10)
+			x - 20, y + 5, 0, self.direction == 1 and 1 or -1, 1, 8, 10)
 end

@@ -13,6 +13,19 @@ Player = Class{__includes = Entity}
 function Player:init(def)
 	local x = 0
 	local y = 0
+
+	x,y = self:findGround(def)
+	Entity.init(self, def)
+	self.score = 0
+	self.lives = def.lives == nil and 3 or def.lives
+	self.coins = def.coins == nil and 1 or def.coins
+	self.health = def.health == nil and 1 or def.health
+	self.key = def.key == nil and false or def.key
+end
+
+function Player:findGround(def)
+	local x = 0
+	local y = 0
 	local tileBottomLeft = def.map:pointToTile(x + 1, y + def.height)
 	local tileBottomRight = def.map:pointToTile(x + def.width - 1, y + def.height)
 	local breakit = false
@@ -38,7 +51,7 @@ function Player:init(def)
 	-- if we get a collision beneath us, go into either walking or idle
 	if (not (tileBottomLeft and tileBottomRight) ) or (not (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or object_position[x][y] then
 		--for y=1,100,TILE_SIZE do
-			--for x=1,100,TILE_SIZE do
+		--for x=1,100,TILE_SIZE do
 		for y=1,100,TILE_SIZE do
 			for x=1,100,TILE_SIZE do
 				tileBottomLeft = def.map:pointToTile(x + 1, y + def.height)
@@ -64,12 +77,9 @@ function Player:init(def)
 		end
 
 	end
-	Entity.init(self, def)
-	self.score = 0
-	self.lives = 3
-	self.health = 1
+	print('def',def['x'],def['y'])
+	return def['x'],def['y']
 end
-
 function Player:update(dt)
 	Entity.update(self, dt)
 end
@@ -128,7 +138,7 @@ function Player:checkObjectCollisions()
 			if object.solid then
 				table.insert(collidedObjects, object)
 			elseif object.consumable then
-				object.onConsume(self)
+				object.onConsume(self,object)
 				table.remove(self.level.objects, k)
 			elseif object.side_collide then
 				object.onCollide(object)
@@ -137,4 +147,26 @@ function Player:checkObjectCollisions()
 	end
 
 	return collidedObjects
+end
+
+function Player:addCoins(coins)
+	self.coins = self.coins + coins
+	if self.coins >= 100 then
+		self.lives = self.lives + 1
+		self.coins = self.coins - 100
+	end
+end
+
+function Player:lifeLost()
+	self.lives = self.lives - 1
+	gSounds['death']:play()
+	if self.lives <= 0 then
+		gStateMachine:change('start')
+	else
+		gStateMachine:change('death',self.stateData)
+	end
+end
+function Player:die()
+	self:lifeLost()
+
 end

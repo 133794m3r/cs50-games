@@ -106,8 +106,8 @@ function FlagObject:init(def)
 	self.onConsume = def.onConsume
 	self.hit = def.hit
 	self.animation = Animation{
-		frames = {def.frame,def.frame + 1},
-		interval = 0.6
+		frames = {def.frame,def.frame + 1,def.frame+1,def.frame,def.frame+1,def.frame+1},
+		interval = 0.45
 	}
 	self.flag_animation = self.animation
 end

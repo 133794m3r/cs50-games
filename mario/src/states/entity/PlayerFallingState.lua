@@ -44,8 +44,7 @@ function PlayerFallingState:update(dt)
 
 	-- go back to start if we fall below the map boundary
 	elseif self.player.y > VIRTUAL_HEIGHT then
-		gSounds['death']:play()
-		gStateMachine:change('start')
+		self.player:lifeLost()
 
 	-- check side collisions and reset position
 	elseif love.keyboard.isDown('left') then
@@ -70,7 +69,7 @@ function PlayerFallingState:update(dt)
 					self.player:changeState('idle')
 				end
 			elseif object.consumable then
-				object.onConsume(self.player)
+				object.onConsume(self.player,object)
 				table.remove(self.player.level.objects, k)
 			elseif object.side_collide then
 				object.onCollide(object)

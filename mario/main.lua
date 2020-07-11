@@ -36,7 +36,8 @@ function love.load()
 
 	gStateMachine = StateMachine {
 		['start'] = function() return StartState() end,
-		['play'] = function() return PlayState() end
+		['play'] = function() return PlayState() end,
+		['death'] = function() return DeathState() end
 	}
 	gStateMachine:change('start')
 
@@ -82,7 +83,7 @@ function love.draw()
 	--love.timer.sleep(NEXT_TIME - cur_time)
 	push:start()
 	gStateMachine:render()
-	fps_counter()
+	--fps_counter()
 	push:finish()
 end
 function fps_counter()

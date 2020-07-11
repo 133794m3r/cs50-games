@@ -31,6 +31,7 @@ require 'src/Util'
 require 'src/states/BaseState'
 require 'src/states/game/PlayState'
 require 'src/states/game/StartState'
+require 'src/states/game/DeathState'
 
 -- entity states
 require 'src/states/entity/PlayerFallingState'
@@ -52,7 +53,10 @@ require 'src/Player'
 require 'src/Snail'
 require 'src/Tile'
 require 'src/TileMap'
+
+-- The player objects that are rendered.
 require 'src/PlayerLives'
+require 'src/PlayerCoins'
 
 gSounds = {
 	['jump'] = love.audio.newSource('sounds/jump.wav','static'),
@@ -76,7 +80,8 @@ gTextures = {
 	['creatures'] = love.graphics.newImage('graphics/creatures.png'),
 	['flags'] = love.graphics.newImage('graphics/flags.png'),
 	['gems'] = love.graphics.newImage('graphics/gems.png'),
-	['locks'] = love.graphics.newImage('graphics/keys_and_locks.png')
+	['locks'] = love.graphics.newImage('graphics/keys_and_locks.png'),
+	['coins_and_bombs'] = love.graphics.newImage('graphics/coins_and_bombs.png')
 }
 
 gFrames = {
@@ -92,7 +97,8 @@ gFrames = {
 	['gems'] = GenerateQuads(gTextures['gems'], 16, 16),
 	['locks'] = GenerateQuads(gTextures['locks'],16,16),
 	['poles'] = GeneratePoleTiles(gTextures['flags'],16,48),
-	['flags'] = GenerateFlagTiles(gTextures['flags'],16,16)
+	['flags'] = GenerateFlagTiles(gTextures['flags'],16,16),
+	['coins_and_bombs'] = GenerateQuads(gTextures['coins_and_bombs'],16,16)
 }
 
 -- these need to be added after gFrames is initialized because they refer to gFrames from within

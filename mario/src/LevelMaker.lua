@@ -30,6 +30,8 @@ function LevelMaker.generate(width, height)
 	local locked_block_spawned = false
 	local prev_block_height = 1
 	local prev_pillar = 1
+	local max_coin_run = 4
+	local prev_block = 0
 	-- so that I can make sure that I'm not respawning something over something that already exists.
 	local object_position = {}
 	for y=1,10 do
@@ -83,9 +85,10 @@ function LevelMaker.generate(width, height)
 			--	prev_column = false
 			--end
 			-- chance to generate a pillar
-			if math.random(8) == 1 then
+			if math.random(8) == 1 and not prev_block  then
 				blockHeight = 2
 				prev_column = true
+				prev_pillar = x
 				-- chance to generate bush on pillar
 				if math.random(8) == 1 then
 					table.insert(objects,
@@ -120,10 +123,51 @@ function LevelMaker.generate(width, height)
 						collidable = false
 					}
 				)
+			elseif math.random(6) == 1 then
+				local num_coins = math.random(3)
+				local variety = math.random()
+				local frame = 1
+				local value = 1
+				local coin_y = math.random(1,5)
+
+				for i=1,num_coins do
+					if variety <= 0.1 then
+						value = 10
+						frame = 3
+					elseif variety <= 0.3 then
+						frame = 2
+						value = 5
+					else
+						frame = 1
+						value = 1
+					end
+					-- maintain reference so we can set it to nil
+					local coin = GameObject {
+						texture = 'coins_and_bombs',
+						x = (x - 1) * TILE_SIZE,
+						y = coin_y * TILE_SIZE,
+						width = 16,
+						height = 16,
+						frame = frame,
+						collidable = true,
+						consumable = true,
+						solid = false,
+						-- coins call the addCoins method of the player object.
+						onConsume = function(player, object)
+							gSounds['pickup']:play()
+							player.score = player.score + 25
+							player:addCoins(object.value)
+						end
+
+					}
+					coin.value = value
+					table.insert(objects,coin)
+				end
 			end
 
 			-- chance to spawn a block
 			if math.random(10) == 1 then
+				prev_block = prev_block + 1
 				table.insert(objects,
 
 					-- jump block
@@ -175,6 +219,47 @@ function LevelMaker.generate(width, height)
 									gSounds['powerup-reveal']:play()
 
 									table.insert(objects, gem)
+								elseif math.random(3) == 1 then
+									local variety = math.random()
+									local frame = 1
+									local value = 1
+									if variety <= 0.1 then
+										value = 10
+										frame = 3
+									elseif variety <= 0.4 then
+										frame = 2
+										value = 5
+									else
+										frame = 1
+										value = 1
+									end
+									-- maintain reference so we can set it to nil
+									local coin = GameObject {
+										texture = 'coins_and_bombs',
+										x = (x - 1) * TILE_SIZE,
+										y = (blockHeight - 1) * TILE_SIZE - 4,
+										width = 16,
+										height = 16,
+										frame = frame,
+										collidable = true,
+										consumable = true,
+										solid = false,
+										-- coins call the addCoins method of the player object.
+										onConsume = function(player, object)
+											gSounds['pickup']:play()
+											player.score = player.score + 25
+											player:addCoins(object.value)
+										end
+
+									}
+									coin.value = value
+									-- make the gem move up from the block and play a sound
+									Timer.tween(0.1, {
+										[coin] = {y = (blockHeight - 2) * TILE_SIZE}
+									})
+									gSounds['powerup-reveal']:play()
+
+									table.insert(objects, coin)
 								end
 
 								obj.hit = true
@@ -201,7 +286,7 @@ function LevelMaker.generate(width, height)
 					-- gem has its own function to add to the player's score
 					onConsume = function(player, object)
 						gSounds['pickup']:play()
-						player.has_key = true
+						player.key = true
 					end
 				}
 				table.insert(objects,
@@ -223,14 +308,21 @@ function LevelMaker.generate(width, height)
 					solid = true,
 					hit = false,
 					onCollide = function(obj,player)
-						if not obj.hit then
+						if not obj.hit and player.key == true then
 							gSounds['pickup']:play()
 							LevelMaker.addFlagGoal(player.level)
-							hit = true
+							obj.hit = true
+							obj.solid = false
+							obj.consumable = true
+							obj.collidable = false
+							player.key = nil
 						end
+					end,
+					onConsume = function(ob)
+
 					end
 				}
-				print(x,y)
+				print('lock x,y',x,y)
 				-- the locked block object has to have special properties.
 				table.insert(objects,
 				lock
@@ -243,26 +335,26 @@ function LevelMaker.generate(width, height)
 
 	local map = TileMap(width, height)
 	map.tiles = tiles
-	local lock = GameObject{
-		texture = 'locks',
-		x = (1 - 1) * TILE_SIZE,
-		y = (2 - 1) * TILE_SIZE,
-		width = 16,
-		height = 16,
-		frame = LOCKS[math.random(4)],
-		collidable = true,
-		consumable = true,
-		solid = true,
-		hit = false,
-		-- gem has its own function to add to the player's score
-		onCollide = function(obj,player)
-			gSounds['pickup']:play()
-			if not obj.hit then
-				LevelMaker.addFlagGoal(player.level)
-			end
-		end
-	}
-	table.insert(objects,lock)
+	--local lock = GameObject{
+	--	texture = 'locks',
+	--	x = (1 - 1) * TILE_SIZE,
+	--	y = (2 - 1) * TILE_SIZE,
+	--	width = 16,
+	--	height = 16,
+	--	frame = LOCKS[math.random(4)],
+	--	collidable = true,
+	--	consumable = true,
+	--	solid = true,
+	--	hit = false,
+	--	-- gem has its own function to add to the player's score
+	--	onCollide = function(obj,player)
+	--		gSounds['pickup']:play()
+	--		if not obj.hit then
+	--			LevelMaker.addFlagGoal(player.level)
+	--		end
+	--	end
+	--}
+	--table.insert(objects,lock)
 	return GameLevel(entities, objects, map)
 end
 
@@ -315,7 +407,6 @@ function LevelMaker.addFlagGoal(level)
 				--y2 = (y - 1) * 8
 				y2 = flag_grounds[y]
 				y3 = y
-				print('y',y)
 				free = true
 			elseif object_position[y][x] then
 				free = false
@@ -327,9 +418,7 @@ function LevelMaker.addFlagGoal(level)
 			break
 		end
 	end
-	print('x2,y2',x2,y2)
 	local flag_chosen = 1+(math.random(0,2)*3)
-	print('fc',flag_chosen)
 	local pole = PoleObject{
 	--table.insert(level.objects,PoleObject {
 		texture = 'poles',
@@ -385,7 +474,6 @@ function LevelMaker.addFlagGoal(level)
 				obj.flag.onCollide(obj.flag)
 			end
 		}
-	print_r(flagPole)
 
 	table.insert(level.objects,flagPole)
 end

@@ -10,15 +10,17 @@ PlayState = Class{__includes = BaseState}
 function PlayState:init()
 	self.camX = 0
 	self.camY = 0
-	self.cur_level = 0
+	self.cur_level = 1
 	self.level = LevelMaker.generate(100, 10)
 	self.tileMap = self.level.tileMap
 	self.background = math.random(3)
 	self.backgroundX = 0
-
+	self.has_lock = true
 	self.gravityOn = true
 	self.gravityAmount = 6
-
+	self.text_y = -100
+	self.pole_spawned = false
+	self.can_input = true
 	self.player = Player({
 		x = 0, y = 0,
 		width = 16, height = 20,
@@ -30,20 +32,51 @@ function PlayState:init()
 			['falling'] = function() return PlayerFallingState(self.player, self.gravityAmount) end
 		},
 		map = self.tileMap,
-		level = self.level
+		level = self.level,
+		key = false
 	})
 	self.lives = PlayerLives(self.player,'green-alien','green-alien-heads')
+	self.coins = PlayerCoins(self.player,'coins_and_bombs','coins_and_bombs')
 	self:spawnEnemies()
-
+	self.player.stateData = self
 	self.player:changeState('falling')
 end
+
 function PlayState:enter(params)
 	if params ~= nil then
 		self.player = params.player
 		self.cur_level = params.cur_level
+		self.coins = params.coins
+		self.lives = params.lives
+		self.level = params.level
+		self.tileMap = params.level.tileMap
+		self.has_lock = params.has_lock
+		self.pole_spawned = params.pole_spawned
+		self.player = params.player
+		self.lives = params.lives
+		self.coins = params.coins
+		self.background = params.background
+		self:spawnEnemies()
 	end
 end
 function PlayState:update(dt)
+	if self.player.key == nil then
+		self.player.key = false
+		self.can_input = false
+		Timer.tween(1.5,{
+				[self] = {text_y = VIRTUAL_HEIGHT / 2 - 8}
+		}):finish(function()
+			Timer.after(2,function()
+				Timer.tween(1.5,{
+					[self] = {text_y = VIRTUAL_HEIGHT + 30}
+				})
+					:finish(function()
+						self.can_input = true
+					end)
+				end)
+		end)
+	end
+
 	Timer.update(dt)
 
 	-- remove any nils from pickups, etc.
@@ -51,9 +84,12 @@ function PlayState:update(dt)
 	if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
 		printf("Player x:%d y:%d\n",self.player.x,self.player.y)
 	end
+
 	-- update player and level
-	self.player:update(dt)
-	self.level:update(dt)
+	if self.can_input == true then
+		self.player:update(dt)
+		self.level:update(dt)
+	end
 
 	-- constrain player X no matter which state
 	if self.player.x <= 0 then
@@ -63,6 +99,7 @@ function PlayState:update(dt)
 	end
 	self.lives:update(dt)
 	self:updateCamera()
+	self.coins:update(dt)
 end
 
 function PlayState:render()
@@ -91,6 +128,28 @@ function PlayState:render()
 
 	-- render lives
 	self.lives:render()
+
+	-- render their coins
+	self.coins:render()
+	-- the "a flag pole has spawned message"
+	love.setColor(95, 205, 228, 200)
+	love.graphics.rectangle('fill', 0, self.text_y - 8, VIRTUAL_WIDTH, 36)
+	love.setColor(255, 255, 255, 255)
+	love.graphics.setFont(gFonts['medium'])
+	love.graphics.printf('The Flag Pole has Spawned!',
+			0, self.text_y, VIRTUAL_WIDTH, 'center')
+
+	-- the paused text screen.
+	if self.paused then
+		love.setColor(95, 205, 228, 200)
+		love.graphics.rectangle('fill', 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, 48)
+		love.setColor(255, 255, 255, 255)
+		love.graphics.setFont(gFonts['large'])
+		love.graphics.printf('Game Paused',
+				0, VIRTUAL_HEIGHT / 2 + 8
+		, VIRTUAL_WIDTH, 'center')
+
+	end
 end
 
 function PlayState:updateCamera()
