@@ -372,7 +372,7 @@ function Board:scoreMatches(score,time)
                 bonus = 1
             end
             if tile.shiny then
-                time_bonus = time_add + 0.125
+                --time_bonus = 1 + 0.125
 
                 bonus = bonus + 0.125
             end
@@ -383,7 +383,7 @@ function Board:scoreMatches(score,time)
         --self.score = self.score + #match * 50
     end
     --Adding the number of matches to the time.
-    time = time + #matches
+    time = time + #self.matches
     --return math.floor(score),math.floor(time)
     return math.floor(score),time
 end
