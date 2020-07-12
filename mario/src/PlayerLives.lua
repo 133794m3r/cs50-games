@@ -18,7 +18,7 @@ function PlayerLives:init(player,atlas,texture)
 		frames = {1,2,3},
 		interval = 1
 	}
-	self.timer = 2
+	self.timer = 3
 	self.cur_time = 0
 	self.currentAnimation = self.animation
 end
@@ -27,7 +27,9 @@ function PlayerLives:update(dt)
 	self.animation:update(dt)
 	self.cur_time = self.cur_time + dt
 	if self.cur_time >= self.timer then
-		self.direction = math.random(2)
+		if math.random(2) == 1 then
+			self.direction = self.direction == 1 and 2 or 1
+		end
 		self.cur_time = 0
 	end
 end
