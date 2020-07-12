@@ -5,10 +5,7 @@
 	Authors: Macarthur Inbody
 	133794m3r@gmail.com
 
-	-- Dependencies --
-
-	A file to organize all of the global dependencies for our project, as
-	well as the assets for our game, rather than pollute our main.lua file.
+	-- Player Lives --
 ]]
 PlayerLives = Class{}
 

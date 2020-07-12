@@ -47,18 +47,23 @@ function Player:findGround(def)
 			object_position[y][x] = true
 		end
 	end
-
+	local y2 = 1
+	local x2 = 1
 	-- if we get a collision beneath us, go into either walking or idle
 	if (not (tileBottomLeft and tileBottomRight) ) or (not (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or object_position[x][y] then
 		--for y=1,100,TILE_SIZE do
 		--for x=1,100,TILE_SIZE do
 		for y=1,100,TILE_SIZE do
+			y2 = y2 + 1
+			x2 = 1
 			for x=1,100,TILE_SIZE do
+				x2 = x2 + 1
 				tileBottomLeft = def.map:pointToTile(x + 1, y + def.height)
 				tileBottomRight = def.map:pointToTile(x + def.width - 1, y + def.height)
 				--tileBottomLeft = def.map.tiles[y][x]
 				--tileBottomRight = def.map.tiles[y][x+1]
-				if( (tileBottomLeft and tileBottomRight) and (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or ( object_position[x][y]) then
+
+				if( (tileBottomLeft and tileBottomRight) and (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or ( object_position[y][x]) then
 					if tileBottomRight:collidable() and not tileBottomLeft:collidable() then
 						def['x'] = x + def.width
 					elseif not tileBottomRight:collidable() and tileBottomLeft:collidable() then

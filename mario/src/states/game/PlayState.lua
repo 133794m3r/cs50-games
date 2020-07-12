@@ -37,7 +37,7 @@ function PlayState:init()
 	})
 	self.lives = PlayerLives(self.player,'green-alien','green-alien-heads')
 	self.coins = PlayerCoins(self.player,'coins_and_bombs','coins_and_bombs')
-	self:spawnEnemies()
+
 	self.player.stateData = self
 	self.player:changeState('falling')
 end
@@ -56,6 +56,8 @@ function PlayState:enter(params)
 		self.lives = params.lives
 		self.coins = params.coins
 		self.background = params.background
+		--self:spawnEnemies()
+	else
 		self:spawnEnemies()
 	end
 end
