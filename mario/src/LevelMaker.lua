@@ -32,6 +32,7 @@ function LevelMaker.generate(width, height)
 	local prev_pillar = 1
 	local max_coin_run = 4
 	local prev_block = 0
+
 	-- so that I can make sure that I'm not respawning something over something that already exists.
 	local object_position = {}
 	for y=1,10 do
@@ -299,7 +300,7 @@ function LevelMaker.generate(width, height)
 				local lock = GameObject{
 					texture = 'locks',
 					x = (x - 1) * TILE_SIZE,
-					y = (2 - 1) * TILE_SIZE,
+					y = (blockHeight - 1) * TILE_SIZE,
 					width = 16,
 					height = 16,
 					frame = LOCKS[math.random(4)],
@@ -316,13 +317,16 @@ function LevelMaker.generate(width, height)
 							obj.consumable = true
 							obj.collidable = false
 							player.key = nil
+							player.stateData.pole_spawned = true
 						end
 					end,
 					onConsume = function(ob)
 
 					end
 				}
-				print('lock x,y',x,y)
+
+				print('lock',(x - 1) * TILE_SIZE, (blockHeight - 1) * TILE_SIZE)
+				--print('lock x,y',x,y)
 				-- the locked block object has to have special properties.
 				table.insert(objects,
 				lock
@@ -457,11 +461,16 @@ function LevelMaker.addFlagGoal(level)
 		solid = true,
 		hit = false,
 		--when they hit it.
-		onCollide = function (obj)
+		onCollide = function (obj,player)
 			Timer.tween(1,{
 			[obj] = {y = obj.y2}
-			})
-
+			}):finish(function()
+				if player.stateData then
+					if player.stateData.new_level == false and player.stateData.pole_spawned == true then
+						player.stateData.new_level = true
+					end
+				end
+			end)
 			end
 		}
 		--})
@@ -469,9 +478,9 @@ function LevelMaker.addFlagGoal(level)
 		local flagPole = FlagPoleObject{
 			flag = flag,
 			pole = pole,
-			onCollide = function(obj)
+			onCollide = function(obj,player)
 				obj.hit = true
-				obj.flag.onCollide(obj.flag)
+				obj.flag.onCollide(obj.flag,player)
 			end
 		}
 

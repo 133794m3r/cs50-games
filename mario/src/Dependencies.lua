@@ -32,6 +32,7 @@ require 'src/states/BaseState'
 require 'src/states/game/PlayState'
 require 'src/states/game/StartState'
 require 'src/states/game/DeathState'
+require 'src/states/game/WinState'
 
 -- entity states
 require 'src/states/entity/PlayerFallingState'

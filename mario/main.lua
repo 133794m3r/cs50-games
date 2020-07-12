@@ -37,7 +37,8 @@ function love.load()
 	gStateMachine = StateMachine {
 		['start'] = function() return StartState() end,
 		['play'] = function() return PlayState() end,
-		['death'] = function() return DeathState() end
+		['death'] = function() return DeathState() end,
+		['win'] = function() return WinState() end
 	}
 	gStateMachine:change('start')
 
@@ -64,7 +65,7 @@ function love.keyboard.wasPressed(key)
 	return love.keyboard.keysPressed[key]
 end
 MIN_FRAME = 1/60
---CUR_TIME = 0
+CUR_TIME = 0
 NEXT_TIME = love.timer.getTime()
 function love.update(dt)
 	NEXT_TIME = NEXT_TIME + MIN_FRAME
@@ -76,11 +77,11 @@ end
 function love.draw()
 
 	local cur_time = love.timer.getTime()
-	--if NEXT_TIME <= cur_time then
-	--	NEXT_TIME = cur_time
-	--	return
-	--end
-	--love.timer.sleep(NEXT_TIME - cur_time)
+	if NEXT_TIME <= cur_time then
+		NEXT_TIME = cur_time
+		return
+	end
+	love.timer.sleep(NEXT_TIME - cur_time)
 	push:start()
 	gStateMachine:render()
 	--fps_counter()

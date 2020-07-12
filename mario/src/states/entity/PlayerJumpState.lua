@@ -33,10 +33,10 @@ function PlayerJumpState:update(dt)
 		Limit the FPS to a maximum of 60. or b) make it so that the gravity system only gets triggered every 1/60th of
 		a second. So that it plays as it did for him.
 	]]
-	if self.cur_time >= self.frame then
+	--if self.cur_time >= self.frame then
 		self.player.dy = self.player.dy + self.gravity
-		self.cur_time = 0
-	end
+	--	self.cur_time = 0
+	--end
 	self.player.y = self.player.y + (self.player.dy * dt)
 
 	-- go into the falling state when y velocity is positive

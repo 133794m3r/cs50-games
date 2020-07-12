@@ -72,7 +72,7 @@ function PlayerFallingState:update(dt)
 				object.onConsume(self.player,object)
 				table.remove(self.player.level.objects, k)
 			elseif object.side_collide then
-				object.onCollide(object)
+				object.onCollide(object,self.player)
 			end
 		end
 	end

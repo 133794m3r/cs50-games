@@ -41,7 +41,7 @@ function PlayerCoins:render()
 	love.setColor(0,0,0,255)
 	love.graphics.print('x',110,5)
 	love.setColor(255,255,255,255)
-	love.graphics.print('x',110,4)
+	love.graphics.print('x',109,4)
 	love.graphics.draw(gTextures[self.atlas],
 			gFrames[self.texture][self.currentAnimation:getCurrentFrame()],
 			100, 10, 0, self.direction == 1 and 1 or -1, 1, 8, 10)

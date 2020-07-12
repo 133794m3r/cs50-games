@@ -4,8 +4,8 @@
 
 	-- Player Class --
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 ]]
 
 Player = Class{__includes = Entity}
@@ -31,47 +31,59 @@ function Player:findGround(def)
 	local breakit = false
 	local objects = def.level.objects
 	local object_position = {}
-	for y=1,100 do
+	local true_position = {}
+
+	for y=0,160,TILE_SIZE do
 		object_position[y] = {}
-		for x=1,100 do
+		true_position[y] = {}
+		for x=0,1600,TILE_SIZE do
 			object_position[y][x] = false
+			true_position[y][x] = {}
+		end
+	end
+	for _, object in pairs(objects) do
+		if object.solid then
+			y = object.y
+			x = object.x
+			object_position[y][x] = true
+			true_position[y][x] = {object.y,object.x}
 		end
 	end
 
-	for _, object in pairs(objects) do
-		if object.collidable then
-			--					x = (x - 1) * TILE_SIZE,
-			--					y = (blockHeight - 1) * TILE_SIZE,
-			y = (object.y / TILE_SIZE) + 1
-			x = (object.x / TILE_SIZE) + 1
-			object_position[y][x] = true
-		end
-	end
-	local y2 = 1
-	local x2 = 1
-	-- if we get a collision beneath us, go into either walking or idle
-	if (not (tileBottomLeft and tileBottomRight) ) or (not (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or object_position[x][y] then
-		--for y=1,100,TILE_SIZE do
-		--for x=1,100,TILE_SIZE do
-		for y=1,100,TILE_SIZE do
-			y2 = y2 + 1
-			x2 = 1
-			for x=1,100,TILE_SIZE do
-				x2 = x2 + 1
+	local y2 = 0
+
+	-- if there is nothing below them, then we need to go across the map trying to find something. We need to iterate
+	-- across the whole map to find a piece of solid ground. once we find it, we set the player's coordinates to be
+	-- just above it.
+
+	if (not (tileBottomLeft and tileBottomRight) ) and (not (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or (not object_position[0][0]) then
+		-- We start with the y coordinate since it is more cache friendly to iterate over this table all the way through
+		-- rather than going down the map.
+		for x=0,1600,TILE_SIZE do
+			--for y=0,160,TILE_SIZE do
+			-- Then we iterate across the entire X axis.
+			for y=0,160,TILE_SIZE do
+				--for x=0,1600,TILE_SIZE do
+				y2 = y
 				tileBottomLeft = def.map:pointToTile(x + 1, y + def.height)
 				tileBottomRight = def.map:pointToTile(x + def.width - 1, y + def.height)
-				--tileBottomLeft = def.map.tiles[y][x]
-				--tileBottomRight = def.map.tiles[y][x+1]
-
-				if( (tileBottomLeft and tileBottomRight) and (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or ( object_position[y][x]) then
+				if( (tileBottomLeft or tileBottomRight) and (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or ( object_position[y][x]) then
 					if tileBottomRight:collidable() and not tileBottomLeft:collidable() then
-						def['x'] = x + def.width
+						def['x'] = x + TILE_SIZE /2
+						print('l')
 					elseif not tileBottomRight:collidable() and tileBottomLeft:collidable() then
-						def['x'] = x + 1
+						print('r')
+						def['x'] = x - TILE_SIZE /2
+					elseif object_position[y][x] then
+						print('obj')
+						def['x'] = true_position[y][x][2]
+						y2 = true_position[y][x][1] - TILE_SIZE/4
 					else
-						def['x'] = x - 1
+						def['x'] = x
+						print('l&r')
+						y2 = y
 					end
-					def['y'] = y
+					def['y'] = y2 - TILE_SIZE /4
 					breakit = true
 					break
 				end
@@ -80,9 +92,8 @@ function Player:findGround(def)
 				break
 			end
 		end
-
 	end
-	print('def',def['x'],def['y'])
+	print('x,y,y2',def['x'],def['y'],y)
 	return def['x'],def['y']
 end
 function Player:update(dt)
@@ -146,7 +157,7 @@ function Player:checkObjectCollisions()
 				object.onConsume(self,object)
 				table.remove(self.level.objects, k)
 			elseif object.side_collide then
-				object.onCollide(object)
+				object.onCollide(object,self)
 			end
 		end
 	end

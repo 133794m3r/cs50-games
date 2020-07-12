@@ -2,32 +2,31 @@
 	GD50
 	Super Mario Bros. Remake
 
-	-- DeathState Class --
+	-- WinState Class --
 ]]
 
-DeathState = Class{__includes = BaseState}
+WinState = Class{__includes = BaseState}
 
-function DeathState:enter(params)
+function WinState:enter(params)
 	self.player = params.player
 	self.cur_level = params.cur_level
 	self.coins = params.coins
 	self.lives = params.lives
-	self.level = params.level
+	self.level = LevelMaker.generate(100, 10)
 	self.tileMap = params.level.tileMap
-	self.has_lock = params.has_lock
-	self.pole_spawned = params.pole_spawned
 	local x = 0
 	local y = 0
 	x,y = self.player:findGround(self.player)
 	self.player.x = x
 	self.player.y = y
-	self.background = params.background
+	self.player.StateDate = nil
+
 end
-function DeathState:update(dt)
+
+function WinState:update(dt)
 	Timer.update(dt)
-	self.lives:update(dt)
-	self.coins:update(dt)
 	if love.keyboard.wasPressed('space') or love.keyboard.wasPressed('t') then
+		print('cl',self.cur_level)
 		gStateMachine:change('play',{
 			player = self.player,
 			cur_level = self.cur_level,
@@ -35,15 +34,13 @@ function DeathState:update(dt)
 			lives = self.lives,
 			level = self.level,
 			tileMap = self.level.tileMap,
-			has_lock = self.has_lock,
-			pole_spawned = self.pole_spawned,
 			player = self.player,
 			lives = self.lives,
-			background = self.background
+			new_level = true
 		})
 	end
 end
-function DeathState:render()
+function WinState:render()
 	love.graphics.setFont(gFonts['medium'])
 	love.setColor(0, 0, 0, 255)
 	love.graphics.print("Level: ", 35, 25)

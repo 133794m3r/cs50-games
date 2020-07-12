@@ -21,6 +21,7 @@ function PlayState:init()
 	self.text_y = -100
 	self.pole_spawned = false
 	self.can_input = true
+	self.new_level = false
 	self.player = Player({
 		x = 0, y = 0,
 		width = 16, height = 20,
@@ -44,19 +45,34 @@ end
 
 function PlayState:enter(params)
 	if params ~= nil then
-		self.player = params.player
-		self.cur_level = params.cur_level
-		self.coins = params.coins
-		self.lives = params.lives
-		self.level = params.level
-		self.tileMap = params.level.tileMap
-		self.has_lock = params.has_lock
-		self.pole_spawned = params.pole_spawned
-		self.player = params.player
-		self.lives = params.lives
-		self.coins = params.coins
-		self.background = params.background
-		--self:spawnEnemies()
+		if params.new_level then
+			self.player = params.player
+			self.coins = params.coins
+			self.lives = params.lives
+			self.level = params.level
+			self.tileMap = self.level.tileMap
+			self:spawnEnemies()
+			self.player.map = self.tileMap
+			self.player.level = self.level
+			local x,y = self.player:findGround(self.player)
+			self.player.x = x
+			self.player.y = y
+			self.player.stateData = self
+
+		else
+			self.player = params.player
+			self.cur_level = params.cur_level
+			self.coins = params.coins
+			self.lives = params.lives
+			self.level = params.level
+			self.tileMap = params.level.tileMap
+			self.has_lock = params.has_lock
+			self.pole_spawned = params.pole_spawned
+			self.player = params.player
+			self.lives = params.lives
+			self.coins = params.coins
+			self.background = params.background
+		end
 	else
 		self:spawnEnemies()
 	end
@@ -78,13 +94,20 @@ function PlayState:update(dt)
 				end)
 		end)
 	end
-
+	if self.new_level then
+		print('next level')
+		self.cur_level = self.cur_level + 1
+		self.new_level = nil
+		gStateMachine:change('win',self)
+	end
 	Timer.update(dt)
 
 	-- remove any nils from pickups, etc.
 	self.level:clear()
 	if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
 		printf("Player x:%d y:%d\n",self.player.x,self.player.y)
+		self.paused = not self.paused
+		self.can_input = not self.can_input
 	end
 
 	-- update player and level
@@ -178,11 +201,13 @@ function PlayState:spawnEnemies()
 		for y = 1, self.tileMap.height do
 			if not groundFound then
 				if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
+					-- If we are near the player we won't let this continue on anymore.
+					if (self.player.x <= x - 2 or self.player.x >= x + 2) and (self.player.y >= y) then
+						break;
+					end
 					groundFound = true
-
 					-- random chance, 1 in 20
 					if math.random(20) == 1 then
-
 						-- instantiate snail, declaring in advance so we can pass it into state machine
 						local snail
 						snail = Snail {
