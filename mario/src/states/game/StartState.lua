@@ -28,7 +28,7 @@ function StartState:render()
 	love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], 0,
 		gTextures['backgrounds']:getHeight() / 3 * 2, 0, 1, -1)
 	self.map:render()
-
+	love.setColor(255,255,255,255)
 	love.graphics.setFont(gFonts['title'])
 	love.setColor(0, 0, 0, 255)
 	love.graphics.printf('Super 50 Bros.', 1, VIRTUAL_HEIGHT / 2 - 40 + 1, VIRTUAL_WIDTH, 'center')

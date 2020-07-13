@@ -77,7 +77,7 @@ function Player:findGround(def)
 					elseif object_position[y][x] then
 						print('obj')
 						def['x'] = true_position[y][x][2]
-						y2 = true_position[y][x][1] - TILE_SIZE/4
+						y2 = true_position[y][x][1] - TILE_SIZE/2
 					else
 						def['x'] = x
 						print('l&r')

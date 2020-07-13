@@ -11,9 +11,9 @@ function PlayState:init()
 	self.camX = 0
 	self.camY = 0
 	self.cur_level = 1
-	self.level = LevelMaker.generate(100, 10)
+	self.level = LevelMaker.generate(50 + (self.cur_level * 10), 10)
 	self.tileMap = self.level.tileMap
-	self.background = math.random(3)
+	self.background = math.random(6)
 	self.backgroundX = 0
 	self.has_lock = true
 	self.gravityOn = true
@@ -58,7 +58,7 @@ function PlayState:enter(params)
 			self.player.x = x
 			self.player.y = y
 			self.player.stateData = self
-
+			self.cur_level = params.cur_level
 		else
 			self.player = params.player
 			self.cur_level = params.cur_level
@@ -129,12 +129,12 @@ end
 
 function PlayState:render()
 	love.graphics.push()
-	love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX), 0)
-	love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX),
-		gTextures['backgrounds']:getHeight() / 3 * 2, 0, 1, -1)
-	love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX + 256), 0)
-	love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX + 256),
-		gTextures['backgrounds']:getHeight() / 3 * 2, 0, 1, -1)
+	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX), 0)
+	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX),
+		gTextures['backgrounds2']:getHeight() / 6 * 2, 0, 1, -1)
+	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX + 256), 0)
+	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX + 256),
+		gTextures['backgrounds2']:getHeight() / 6 * 2, 0, 1, -1)
 
 	-- translate the entire view of the scene to emulate a camera
 	love.graphics.translate(-math.floor(self.camX), -math.floor(self.camY))
@@ -161,8 +161,7 @@ function PlayState:render()
 	love.graphics.rectangle('fill', 0, self.text_y - 8, VIRTUAL_WIDTH, 36)
 	love.setColor(255, 255, 255, 255)
 	love.graphics.setFont(gFonts['medium'])
-	love.graphics.printf('The Flag Pole has Spawned!',
-			0, self.text_y, VIRTUAL_WIDTH, 'center')
+	love.graphics.printf('GET TO THE FLAG POLE!', 0, self.text_y, VIRTUAL_WIDTH, 'center')
 
 	-- the paused text screen.
 	if self.paused then
@@ -170,9 +169,7 @@ function PlayState:render()
 		love.graphics.rectangle('fill', 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, 48)
 		love.setColor(255, 255, 255, 255)
 		love.graphics.setFont(gFonts['large'])
-		love.graphics.printf('Game Paused',
-				0, VIRTUAL_HEIGHT / 2 + 8
-		, VIRTUAL_WIDTH, 'center')
+		love.graphics.printf('Game Paused', 0, VIRTUAL_HEIGHT / 2 + 8, VIRTUAL_WIDTH, 'center')
 
 	end
 end
@@ -192,6 +189,7 @@ end
 	Adds a series of enemies to the level randomly.
 ]]
 function PlayState:spawnEnemies()
+	local enemyChance = math.ceil( 20 - self.cur_level/2)
 	-- spawn snails in the level
 	for x = 1, self.tileMap.width do
 
@@ -202,12 +200,12 @@ function PlayState:spawnEnemies()
 			if not groundFound then
 				if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
 					-- If we are near the player we won't let this continue on anymore.
-					if (self.player.x <= x - 2 or self.player.x >= x + 2) and (self.player.y >= y) then
+					if (self.player.x <= x - 1 or self.player.x >= x + 1) and (self.player.y >= y) then
 						break;
 					end
 					groundFound = true
 					-- random chance, 1 in 20
-					if math.random(20) == 1 then
+					if math.random(enemyChance ) == 1 then
 						-- instantiate snail, declaring in advance so we can pass it into state machine
 						local snail
 						snail = Snail {

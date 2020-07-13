@@ -76,12 +76,12 @@ end
 
 function love.draw()
 
-	local cur_time = love.timer.getTime()
-	if NEXT_TIME <= cur_time then
-		NEXT_TIME = cur_time
-		return
-	end
-	love.timer.sleep(NEXT_TIME - cur_time)
+	--local cur_time = love.timer.getTime()
+	--if NEXT_TIME <= cur_time then
+	--	NEXT_TIME = cur_time
+	--	return
+	--end
+	--love.timer.sleep(NEXT_TIME - cur_time)
 	push:start()
 	gStateMachine:render()
 	--fps_counter()

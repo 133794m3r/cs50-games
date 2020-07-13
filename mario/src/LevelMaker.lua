@@ -125,16 +125,16 @@ function LevelMaker.generate(width, height)
 					}
 				)
 			elseif math.random(6) == 1 then
-				local num_coins = math.random(3)
+				--local num_coins = math.random(3)
 				local variety = math.random()
 				local frame = 1
 				local value = 1
 				local coin_y = math.random(1,5)
 
-				for i=1,num_coins do
+				--for i=1,num_coins do
 					if variety <= 0.1 then
-						value = 10
 						frame = 3
+						value = 5
 					elseif variety <= 0.3 then
 						frame = 2
 						value = 5
@@ -163,7 +163,7 @@ function LevelMaker.generate(width, height)
 					}
 					coin.value = value
 					table.insert(objects,coin)
-				end
+				--end
 			end
 
 			-- chance to spawn a block
@@ -225,8 +225,8 @@ function LevelMaker.generate(width, height)
 									local frame = 1
 									local value = 1
 									if variety <= 0.1 then
-										value = 10
 										frame = 3
+										value = 5
 									elseif variety <= 0.4 then
 										frame = 2
 										value = 5
@@ -290,9 +290,8 @@ function LevelMaker.generate(width, height)
 						player.key = true
 					end
 				}
-				table.insert(objects,
-						key
-				)
+				table.insert(objects, key)
+				print('key',(x-1) * TILE_SIZE ,(blockHeight - 1 ) * TILE_SIZE)
 			elseif math.random(30) == 1 and locked_block_spawned == false then
 				locked_block_spawned = true
 
@@ -328,15 +327,60 @@ function LevelMaker.generate(width, height)
 				print('lock',(x - 1) * TILE_SIZE, (blockHeight - 1) * TILE_SIZE)
 				--print('lock x,y',x,y)
 				-- the locked block object has to have special properties.
-				table.insert(objects,
-				lock
-				)
+				table.insert(objects, lock)
 				prev_column = true
 			end
 		end
 		::continue::
 	end
+	if not locked_block_spawned then
+		local lock = GameObject{
+			texture = 'locks',
+			x = (math.random(width) - 1) * TILE_SIZE,
+			y = 1 * TILE_SIZE,
+			width = 16,
+			height = 16,
+			frame = LOCKS[math.random(4)],
+			collidable = true,
+			consumable = false,
+			solid = true,
+			hit = false,
+			onCollide = function(obj,player)
+				if not obj.hit and player.key == true then
+					gSounds['pickup']:play()
+					LevelMaker.addFlagGoal(player.level)
+					obj.hit = true
+					obj.solid = false
+					obj.consumable = true
+					obj.collidable = false
+					player.key = nil
+					player.stateData.pole_spawned = true
+				end
+			end,
+			onConsume = function(ob)
 
+			end
+		}
+		table.insert(objects,lock)
+	elseif not key_spawned then
+		local key =	GameObject{
+			texture = 'locks',
+			x = (math.random(width) - 1) * TILE_SIZE,
+			y = 1 * TILE_SIZE,
+			width = 16,
+			height = 16,
+			frame = KEYS[math.random(4)],
+			collidable = true,
+			consumable = true,
+			solid = false,
+			-- gem has its own function to add to the player's score
+			onConsume = function(player, object)
+				gSounds['pickup']:play()
+				player.key = true
+			end
+		}
+		table.insert(objects, key)
+	end
 	local map = TileMap(width, height)
 	map.tiles = tiles
 	--local lock = GameObject{
@@ -403,7 +447,7 @@ function LevelMaker.addFlagGoal(level)
 		[7] = 48
 	}
 	while free == false do
-	x = math.random(100)
+	x = math.random(width)
 	---for x=1,100 do
 		free = false
 		for y=2,10 do
