@@ -24,15 +24,34 @@ function Player:init(def)
 	self.key = def.key == nil and false or def.key
 end
 
-function Player:findGround(def)
-	local x = 0
-	local y = 0
+function Player:findGround(def,direction)
+	local x = def['x']
+	local y = def['y']
 	local tileBottomLeft = def.map:pointToTile(x + 1, y + def.height)
 	local tileBottomRight = def.map:pointToTile(x + def.width - 1, y + def.height)
 	local breakit = false
 	local objects = def.level.objects
 	local object_position = {}
 	local true_position = {}
+	local start_x=0
+	local end_x = 1600
+	local start_y=0
+	local end_y=160
+	local increment = TILE_SIZE
+
+	if direction == nil then
+		start_x = 0
+		end_x = 1600
+		increment = TILE_SIZE
+	elseif direction == 'left' then
+		start_x = x
+		end_x = 0
+		increment = -TILE_SIZE
+	elseif dirction == 'right' then
+		start_x = x
+		end_x = 1600
+		increment = TILE_SIZE
+	end
 
 	for y=0,160,TILE_SIZE do
 		object_position[y] = {}
@@ -57,14 +76,12 @@ function Player:findGround(def)
 	-- across the whole map to find a piece of solid ground. once we find it, we set the player's coordinates to be
 	-- just above it.
 
-	if (not (tileBottomLeft and tileBottomRight) ) and (not (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or (not object_position[0][0]) then
+	if (not (tileBottomLeft and tileBottomRight) ) or (not (tileBottomLeft:collidable() or tileBottomRight:collidable()) ) or (not object_position[0][0]) then
 		-- We start with the y coordinate since it is more cache friendly to iterate over this table all the way through
 		-- rather than going down the map.
-		for x=0,1600,TILE_SIZE do
-			--for y=0,160,TILE_SIZE do
+		for x=start_x,end_x,increment do
 			-- Then we iterate across the entire X axis.
-			for y=0,160,TILE_SIZE do
-				--for x=0,1600,TILE_SIZE do
+			for y=start_y,end_y,increment do
 				y2 = y
 				tileBottomLeft = def.map:pointToTile(x + 1, y + def.height)
 				tileBottomRight = def.map:pointToTile(x + def.width - 1, y + def.height)

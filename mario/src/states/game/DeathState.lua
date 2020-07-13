@@ -16,6 +16,8 @@ function DeathState:enter(params)
 	self.tileMap = params.level.tileMap
 	self.has_lock = params.has_lock
 	self.pole_spawned = params.pole_spawned
+	self.key_color = params.key_color
+	self.player.key = params.player.key
 	local x = 0
 	local y = 0
 	x,y = self.player:findGround(self.player)
@@ -39,7 +41,8 @@ function DeathState:update(dt)
 			pole_spawned = self.pole_spawned,
 			player = self.player,
 			lives = self.lives,
-			background = self.background
+			background = self.background,
+			key_color = self.key_color
 		})
 	end
 end

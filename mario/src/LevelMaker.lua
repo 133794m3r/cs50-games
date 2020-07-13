@@ -276,6 +276,7 @@ function LevelMaker.generate(width, height)
 					onConsume = function(player, object)
 						gSounds['pickup']:play()
 						player.key = true
+						print('player_key',object.frame)
 						player.stateData.key_color = object.frame
 					end
 				}
@@ -298,6 +299,13 @@ function LevelMaker.generate(width, height)
 					hit = false,
 					onCollide = function(obj,player)
 						if not obj.hit and player.key then
+							local direction = false
+							if love.keyboard.isDown('left') then
+								direction = 'left'
+							elseif love.keyboard.isDown('right') then
+								direction = 'right'
+							end
+							player.x,player.y = player:findGround(player,direction)
 							gSounds['pickup']:play()
 							LevelMaker.addFlagGoal(player.level)
 							obj.hit = true
@@ -327,7 +335,7 @@ function LevelMaker.generate(width, height)
 		local lock
 		while not locked_block_spawned do
 			x = math.random(width) - 1
-			if not object_position[x] then
+			if not object_position[x] and not object_position[x-1] and not object_position[x+1] then
 				lock = GameObject{
 					texture = 'locks',
 					x = (math.random(width) - 1) * TILE_SIZE,
@@ -344,7 +352,14 @@ function LevelMaker.generate(width, height)
 							gSounds['pickup']:play()
 							LevelMaker.addFlagGoal(player.level)
 							obj.hit = true
-							player.x = obj.x
+							local direction = false
+							if love.keyboard.isDown('left') then
+								direction = 'left'
+							elseif love.keyboard.isDown('right') then
+								direction = 'right'
+							end
+							player.x,player.y = player:findGround(player,direction)
+
 							obj.solid = false
 							obj.consumable = true
 							obj.collidable = false
@@ -384,6 +399,7 @@ function LevelMaker.generate(width, height)
 					-- gem has its own function to add to the player's score
 					onConsume = function(player, object)
 						gSounds['pickup']:play()
+						print('player_key',object.frame)
 						player.stateData.key_color = object.frame
 						player.key = true
 					end
@@ -494,7 +510,6 @@ function LevelMaker.addFlagGoal(level)
 		--when they hit it.
 		onCollide = function (obj,player)
 			if not obj.hit then
-				print_r(player.stateData)
 				player.stateData.can_input = false
 				local frame
 				obj.hit = true
@@ -518,6 +533,7 @@ function LevelMaker.addFlagGoal(level)
 			flag = flag,
 			pole = pole,
 			onCollide = function(obj,player)
+				print_r(player.stateData)
 				obj.hit = true
 				obj.flag.onCollide(obj.flag,player)
 			end

@@ -60,6 +60,7 @@ function PlayState:enter(params)
 			self.player.y = y
 			self.player.stateData = self
 			self.cur_level = params.cur_level
+
 		else
 			self.player = params.player
 			self.cur_level = params.cur_level
@@ -74,6 +75,8 @@ function PlayState:enter(params)
 			self.coins = params.coins
 			self.background = params.background
 		end
+		self.key_color = params.key_color
+		self.player.stateData = self
 	else
 		self:spawnEnemies()
 	end

@@ -21,8 +21,12 @@ function WinState:enter(params)
 	self.player.x = x
 	self.player.y = y
 	self.player.StateDate = nil
-	self.backgroundX = params.backgroundX
-
+	self.backgroundX = 0
+	print('background',self.background)
+	for i=1,9 do
+		print(i)
+		print_r(gFrames['backgrounds2'][i])
+	end
 end
 
 function WinState:update(dt)
@@ -52,18 +56,9 @@ function WinState:render()
 			gTextures['backgrounds2']:getHeight() / 9 * 2, 0, 1, -1)
 
 	love.graphics.setFont(gFonts['medium'])
-	love.setColor(255,255,255,255)
-	love.graphics.print('Next Level',100 , 10)
-
-	love.graphics.setFont(gFonts['medium'])
 	love.setColor(0, 0, 0, 255)
-	love.graphics.print("Level: ", 35, 25)
+	love.graphics.print("Level "..tostring(self.cur_level)..' Start', 35, 25)
 	love.setColor(255, 255, 255, 255)
-	love.graphics.print("Level: ", 34, 24)
+	love.graphics.print("Level "..tostring(self.cur_level)..' Start', 34, 24)
 
-	love.setColor(0,0,0,255)
-	love.graphics.print(tostring(self.level),85,25)
-	love.setColor(255, 255, 255, 255)
-	love.graphics.print(tostring(self.cur_level),84,24)
-	self.lives:render(VIRTUAL_WIDTH / 2 + 2,VIRTUAL_HEIGHT / 2 + 2)
 end
