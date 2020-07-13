@@ -32,14 +32,12 @@ function LevelMaker.generate(width, height)
 	local prev_pillar = 1
 	local max_coin_run = 4
 	local prev_block = 0
-
+	local prev_empty = 0
+	local lock_x = 0
 	-- so that I can make sure that I'm not respawning something over something that already exists.
 	local object_position = {}
-	for y=1,10 do
-		object_position[y] = {}
-		for x=1,100 do
-			object_position[y][x] = false
-		end
+	for x=1,width do
+		object_position[x] = false
 	end
 
 	-- insert blank tables into tiles for later access
@@ -64,7 +62,9 @@ function LevelMaker.generate(width, height)
 					Tile(x, y, tileID, nil, tileset, topperset))
 			end
 			cur_empty = cur_empty + 1
+
 		else
+			prev_empty = cur_empty
 			cur_empty = 0
 			tileID = TILE_ID_GROUND
 
@@ -74,29 +74,17 @@ function LevelMaker.generate(width, height)
 				table.insert(tiles[y],
 					Tile(x, y, tileID, y == 7 and topper or nil, tileset, topperset))
 			end
-			--if prev_column and cur_skip ~= 0 then
-			--	cur_skip = cur_skip - 1
-			--	prev_column = false
-			--	goto continue
-			--elseif prev_column then
-			--	cur_skip = column_skip
-			--	prev_column = false
-			--	goto continue
-			--else
-			--	prev_column = false
-			--end
-			-- chance to generate a pillar
 			if math.random(8) == 1 and not prev_block  then
+
 				blockHeight = 2
 				prev_column = true
-				prev_pillar = x
 				-- chance to generate bush on pillar
 				if math.random(8) == 1 then
 					table.insert(objects,
 						GameObject {
 							texture = 'bushes',
 							x = (x - 1) * TILE_SIZE,
-							y = (4 - 1) * TILE_SIZE,
+							y = 3 * TILE_SIZE,
 							width = 16,
 							height = 16,
 
@@ -165,9 +153,9 @@ function LevelMaker.generate(width, height)
 					table.insert(objects,coin)
 				--end
 			end
-
 			-- chance to spawn a block
-			if math.random(10) == 1 then
+			if math.random(10) == 1 and lock_x < x then
+				object_position[x] = true
 				prev_block = prev_block + 1
 				table.insert(objects,
 
@@ -288,13 +276,14 @@ function LevelMaker.generate(width, height)
 					onConsume = function(player, object)
 						gSounds['pickup']:play()
 						player.key = true
+						player.stateData.key_color = object.frame
 					end
 				}
 				table.insert(objects, key)
 				print('key',(x-1) * TILE_SIZE ,(blockHeight - 1 ) * TILE_SIZE)
 			elseif math.random(30) == 1 and locked_block_spawned == false then
 				locked_block_spawned = true
-
+				lock_x = x+2
 			-- make it a random variant
 				local lock = GameObject{
 					texture = 'locks',
@@ -308,10 +297,54 @@ function LevelMaker.generate(width, height)
 					solid = true,
 					hit = false,
 					onCollide = function(obj,player)
+						if not obj.hit and player.key then
+							gSounds['pickup']:play()
+							LevelMaker.addFlagGoal(player.level)
+							obj.hit = true
+							obj.solid = false
+							obj.consumable = true
+							obj.collidable = false
+							player.key = nil
+							player.x = obj.x
+							player.stateData.pole_spawned = true
+						end
+					end,
+					onConsume = function(ob)
+
+					end
+				}
+
+				print('lock',(x - 1) * TILE_SIZE, (blockHeight - 1) * TILE_SIZE)
+				table.insert(objects, lock)
+				prev_column = true
+			end
+		end
+		::continue::
+	end
+	local x = width
+	x = width
+	if not locked_block_spawned then
+		local lock
+		while not locked_block_spawned do
+			x = math.random(width) - 1
+			if not object_position[x] then
+				lock = GameObject{
+					texture = 'locks',
+					x = (math.random(width) - 1) * TILE_SIZE,
+					y = 1 * TILE_SIZE,
+					width = 16,
+					height = 16,
+					frame = LOCKS[math.random(4)],
+					collidable = true,
+					consumable = false,
+					solid = true,
+					hit = false,
+					onCollide = function(obj,player)
 						if not obj.hit and player.key == true then
 							gSounds['pickup']:play()
 							LevelMaker.addFlagGoal(player.level)
 							obj.hit = true
+							player.x = obj.x
 							obj.solid = false
 							obj.consumable = true
 							obj.collidable = false
@@ -323,86 +356,45 @@ function LevelMaker.generate(width, height)
 
 					end
 				}
-
-				print('lock',(x - 1) * TILE_SIZE, (blockHeight - 1) * TILE_SIZE)
-				--print('lock x,y',x,y)
-				-- the locked block object has to have special properties.
-				table.insert(objects, lock)
-				prev_column = true
+				locked_block_spawned = true
 			end
 		end
-		::continue::
-	end
-	if not locked_block_spawned then
-		local lock = GameObject{
-			texture = 'locks',
-			x = (math.random(width) - 1) * TILE_SIZE,
-			y = 1 * TILE_SIZE,
-			width = 16,
-			height = 16,
-			frame = LOCKS[math.random(4)],
-			collidable = true,
-			consumable = false,
-			solid = true,
-			hit = false,
-			onCollide = function(obj,player)
-				if not obj.hit and player.key == true then
-					gSounds['pickup']:play()
-					LevelMaker.addFlagGoal(player.level)
-					obj.hit = true
-					obj.solid = false
-					obj.consumable = true
-					obj.collidable = false
-					player.key = nil
-					player.stateData.pole_spawned = true
-				end
-			end,
-			onConsume = function(ob)
-
-			end
-		}
 		table.insert(objects,lock)
 	elseif not key_spawned then
-		local key =	GameObject{
-			texture = 'locks',
-			x = (math.random(width) - 1) * TILE_SIZE,
-			y = 1 * TILE_SIZE,
-			width = 16,
-			height = 16,
-			frame = KEYS[math.random(4)],
-			collidable = true,
-			consumable = true,
-			solid = false,
-			-- gem has its own function to add to the player's score
-			onConsume = function(player, object)
-				gSounds['pickup']:play()
-				player.key = true
+		local key = {}
+		print('key no spawned')
+		if x <= width /2 then
+			width = width - x
+		else
+			width = width - 1
+		end
+		while not key_spawned do
+			x = math.random(width)
+			if not object_position[x] then
+				key = GameObject{
+					texture = 'locks',
+					x = x * TILE_SIZE,
+					y = 1 * TILE_SIZE,
+					width = 16,
+					height = 16,
+					frame = KEYS[math.random(4)],
+					collidable = true,
+					consumable = true,
+					solid = false,
+					-- gem has its own function to add to the player's score
+					onConsume = function(player, object)
+						gSounds['pickup']:play()
+						player.stateData.key_color = object.frame
+						player.key = true
+					end
+				}
+				key_spawned = true
 			end
-		}
+		end
 		table.insert(objects, key)
 	end
 	local map = TileMap(width, height)
 	map.tiles = tiles
-	--local lock = GameObject{
-	--	texture = 'locks',
-	--	x = (1 - 1) * TILE_SIZE,
-	--	y = (2 - 1) * TILE_SIZE,
-	--	width = 16,
-	--	height = 16,
-	--	frame = LOCKS[math.random(4)],
-	--	collidable = true,
-	--	consumable = true,
-	--	solid = true,
-	--	hit = false,
-	--	-- gem has its own function to add to the player's score
-	--	onCollide = function(obj,player)
-	--		gSounds['pickup']:play()
-	--		if not obj.hit then
-	--			LevelMaker.addFlagGoal(player.level)
-	--		end
-	--	end
-	--}
-	--table.insert(objects,lock)
 	return GameLevel(entities, objects, map)
 end
 
@@ -448,11 +440,9 @@ function LevelMaker.addFlagGoal(level)
 	}
 	while free == false do
 	x = math.random(width)
-	---for x=1,100 do
 		free = false
 		for y=2,10 do
 			if tiles[y][x]:collidable() and free == false then
-				--y2 = (y - 1) * 8
 				y2 = flag_grounds[y]
 				y3 = y
 				free = true
@@ -468,7 +458,6 @@ function LevelMaker.addFlagGoal(level)
 	end
 	local flag_chosen = 1+(math.random(0,2)*3)
 	local pole = PoleObject{
-	--table.insert(level.objects,PoleObject {
 		texture = 'poles',
 		atlas = 'flags',
 		x = (x2 - 1) * TILE_SIZE,
@@ -488,10 +477,8 @@ function LevelMaker.addFlagGoal(level)
 			end
 		end
 	}
-	--})
 
 	local flag = FlagObject {
-		--table.insert(level.objects,FlagObject{
 		texture = 'flags',
 		atlas = 'flags',
 		x = ((x2 - 1) * TILE_SIZE) + 10,
@@ -506,18 +493,26 @@ function LevelMaker.addFlagGoal(level)
 		hit = false,
 		--when they hit it.
 		onCollide = function (obj,player)
-			Timer.tween(1,{
-			[obj] = {y = obj.y2}
-			}):finish(function()
-				if player.stateData then
-					if player.stateData.new_level == false and player.stateData.pole_spawned == true then
-						player.stateData.new_level = true
-					end
+			if not obj.hit then
+				print_r(player.stateData)
+				player.stateData.can_input = false
+				local frame
+				obj.hit = true
+				frame = obj.animation.frames[2] + 1
+				obj.animation = Animation{
+				frames = {frame},
+				interval = 300
+				}
+				Timer.tween(1,{
+				[obj] = {y = obj.y2}
+				}):finish(function()
+						player.stateData.cur_level = player.stateData.cur_level + 1
+						player.stateData.new_level = false
+						gStateMachine:change('win',player.stateData)
+					end)
 				end
-			end)
 			end
 		}
-		--})
 
 		local flagPole = FlagPoleObject{
 			flag = flag,
@@ -527,6 +522,5 @@ function LevelMaker.addFlagGoal(level)
 				obj.flag.onCollide(obj.flag,player)
 			end
 		}
-
 	table.insert(level.objects,flagPole)
 end

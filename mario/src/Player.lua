@@ -13,11 +13,12 @@ Player = Class{__includes = Entity}
 function Player:init(def)
 	local x = 0
 	local y = 0
-
-	x,y = self:findGround(def)
+	if def.map then
+		x,y = self:findGround(def)
+	end
 	Entity.init(self, def)
 	self.score = 0
-	self.lives = def.lives == nil and 3 or def.lives
+	self.lives = def.lives == nil and 2 or def.lives
 	self.coins = def.coins == nil and 1 or def.coins
 	self.health = def.health == nil and 1 or def.health
 	self.key = def.key == nil and false or def.key
@@ -77,7 +78,7 @@ function Player:findGround(def)
 					elseif object_position[y][x] then
 						print('obj')
 						def['x'] = true_position[y][x][2]
-						y2 = true_position[y][x][1] - TILE_SIZE/2
+						y2 = true_position[y][x][1] - TILE_SIZE
 					else
 						def['x'] = x
 						print('l&r')

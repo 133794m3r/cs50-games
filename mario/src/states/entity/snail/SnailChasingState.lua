@@ -12,8 +12,9 @@ function SnailChasingState:init(tilemap, player, snail)
 	self.tilemap = tilemap
 	self.player = player
 	self.snail = snail
+	local frame = snail.variety == 1 and 49 or 53
 	self.animation = Animation {
-		frames = {49, 50},
+		frames = {frame, frame+1},
 		interval = 0.5
 	}
 	self.snail.currentAnimation = self.animation

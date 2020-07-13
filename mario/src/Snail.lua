@@ -11,6 +11,7 @@
 Snail = Class{__includes = Entity}
 
 function Snail:init(def)
+	self.variety = def.variety
 	Entity.init(self, def)
 end
 

@@ -11,7 +11,7 @@ function PlayState:init()
 	self.camX = 0
 	self.camY = 0
 	self.cur_level = 1
-	self.level = LevelMaker.generate(50 + (self.cur_level * 10), 10)
+	self.level = LevelMaker.generate(70 + (self.cur_level * 5), 10)
 	self.tileMap = self.level.tileMap
 	self.background = math.random(6)
 	self.backgroundX = 0
@@ -22,7 +22,8 @@ function PlayState:init()
 	self.pole_spawned = false
 	self.can_input = true
 	self.new_level = false
-	self.player = Player({
+	--self.new_level = false
+	self.player= Player({
 		x = 0, y = 0,
 		width = 16, height = 20,
 		texture = 'green-alien',
@@ -38,7 +39,7 @@ function PlayState:init()
 	})
 	self.lives = PlayerLives(self.player,'green-alien','green-alien-heads')
 	self.coins = PlayerCoins(self.player,'coins_and_bombs','coins_and_bombs')
-
+	self.key_color = nil
 	self.player.stateData = self
 	self.player:changeState('falling')
 end
@@ -94,20 +95,16 @@ function PlayState:update(dt)
 				end)
 		end)
 	end
-	if self.new_level then
-		print('next level')
-		self.cur_level = self.cur_level + 1
-		self.new_level = nil
-		gStateMachine:change('win',self)
-	end
 	Timer.update(dt)
 
 	-- remove any nils from pickups, etc.
 	self.level:clear()
 	if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
 		printf("Player x:%d y:%d\n",self.player.x,self.player.y)
-		self.paused = not self.paused
-		self.can_input = not self.can_input
+		if self.can_input or self.paused then
+			self.paused = not self.paused
+			self.can_input = not self.can_input
+		end
 	end
 
 	-- update player and level
@@ -131,10 +128,10 @@ function PlayState:render()
 	love.graphics.push()
 	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX), 0)
 	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX),
-		gTextures['backgrounds2']:getHeight() / 6 * 2, 0, 1, -1)
+		gTextures['backgrounds2']:getHeight() / 9 * 2, 0, 1, -1)
 	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX + 256), 0)
 	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX + 256),
-		gTextures['backgrounds2']:getHeight() / 6 * 2, 0, 1, -1)
+		gTextures['backgrounds2']:getHeight() / 9 * 2, 0, 1, -1)
 
 	-- translate the entire view of the scene to emulate a camera
 	love.graphics.translate(-math.floor(self.camX), -math.floor(self.camY))
@@ -166,11 +163,14 @@ function PlayState:render()
 	-- the paused text screen.
 	if self.paused then
 		love.setColor(95, 205, 228, 200)
-		love.graphics.rectangle('fill', 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, 48)
+		love.graphics.rectangle('fill', 0, VIRTUAL_HEIGHT / 2-20, VIRTUAL_WIDTH, 48)
 		love.setColor(255, 255, 255, 255)
 		love.graphics.setFont(gFonts['large'])
-		love.graphics.printf('Game Paused', 0, VIRTUAL_HEIGHT / 2 + 8, VIRTUAL_WIDTH, 'center')
+		love.graphics.printf('Game Paused', 0, VIRTUAL_HEIGHT / 2 -12 , VIRTUAL_WIDTH, 'center')
 
+	end
+	if self.player.key then
+		love.graphics.draw(gTextures['locks'],gFrames['locks'][self.key_color],150,0)
 	end
 end
 
@@ -190,21 +190,23 @@ end
 ]]
 function PlayState:spawnEnemies()
 	local enemyChance = math.ceil( 20 - self.cur_level/2)
+	local player_x = self.player.x / 16
+	local player_x2 = player_x + 2
+	player_x = player_x - 2
 	-- spawn snails in the level
 	for x = 1, self.tileMap.width do
-
+		if (x <= player_x2 and x >= player_x) then
+			goto next
+		end
+		groundFound = true
 		-- flag for whether there's ground on this column of the level
 		local groundFound = false
-
 		for y = 1, self.tileMap.height do
 			if not groundFound then
 				if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
 					-- If we are near the player we won't let this continue on anymore.
-					if (self.player.x <= x - 1 or self.player.x >= x + 1) and (self.player.y >= y) then
-						break;
-					end
-					groundFound = true
 					-- random chance, 1 in 20
+					groundFound = true
 					if math.random(enemyChance ) == 1 then
 						-- instantiate snail, declaring in advance so we can pass it into state machine
 						local snail
@@ -218,7 +220,8 @@ function PlayState:spawnEnemies()
 								['idle'] = function() return SnailIdleState(self.tileMap, self.player, snail) end,
 								['moving'] = function() return SnailMovingState(self.tileMap, self.player, snail) end,
 								['chasing'] = function() return SnailChasingState(self.tileMap, self.player, snail) end
-							}
+							},
+							variety = math.random(2)
 						}
 						snail:changeState('idle', {
 							wait = math.random(5)
@@ -229,5 +232,6 @@ function PlayState:spawnEnemies()
 				end
 			end
 		end
+		::next::
 	end
 end

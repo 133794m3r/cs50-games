@@ -34,7 +34,7 @@ function PlayerJumpState:update(dt)
 		a second. So that it plays as it did for him.
 	]]
 	if self.cur_time >= self.frame then
-		self.player.dy = self.player.dy + self.gravity + 0.45
+		self.player.dy = self.player.dy + self.gravity + 0.44
 		self.cur_time = 0
 		self.player.y = self.player.y + (self.player.dy * self.frame)
 	end
