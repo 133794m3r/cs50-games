@@ -5,7 +5,10 @@
 	Authors: Macarthur Inbody
 	133794m3r@gmail.com
 
-	-- Player Lives --
+	-- PlayerLives Class --
+	This class shows the current lives that the player has. It also has a simple animation that is shown.
+	This animation is similar to that of Wolf3d or DOOM in that it shows the character's head and some random  movements
+	so that it looks to be "alive".
 ]]
 PlayerLives = Class{}
 
@@ -37,14 +40,12 @@ end
 function PlayerLives:render(x,y)
 	x = x == nil and 80 or x
 	y = y == nil and 6 or y
-	--love.graphics.draw(gTextures['green-alien'],gFrames['green-alien-heads'][1],55,3,0,1,1)
 	love.graphics.setFont(gFonts['small'])
 	love.setColor(0, 0, 0, 255)
 	love.graphics.print(tostring(self.player.lives), x-2, y)
 	love.setColor(255, 255, 255, 255)
 	love.graphics.print(tostring(self.player.lives), x-3, y-1)
 
-	--love.graphics.setFont(gFonts['medium'])
 	love.setColor(0,0,0,255)
 	love.graphics.print('x',x-7,y)
 	love.setColor(255,255,255,255)

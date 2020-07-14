@@ -2,10 +2,14 @@
 	GD50
 	Super Mario Bros. Remake
 
-	-- Player Class --
-
 	Authors: Colton Ogden, Macarthur Inbody
 	cogden@cs50.harvard.edu, 133794m3r@gmail.com
+
+	-- Player Class --
+	This class is the current player aka the person controlling the character. It handles all of the baisc items
+	that are required. The rest is handled via states. It also allows us to pass the state values, during a new level
+	and other similar events w/o having to deal with a global due to the fact that everything is a table backed by
+	pointers in lua.
 ]]
 
 Player = Class{__includes = Entity}

@@ -1,10 +1,13 @@
 --[[
-	GD50
+V	GD50
 	Super Mario Bros. Remake
 
-	-- DeathState Class --
-]]
+	Authors: Macarthur Inbody
+	133794m3r@gmail.com
 
+	-- DeathState Class --
+	This state is what's used when the player dies.
+]]
 DeathState = Class{__includes = BaseState}
 
 function DeathState:enter(params)

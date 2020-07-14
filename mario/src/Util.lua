@@ -7,7 +7,7 @@
 	Authors: Colton Ogden, Macarthur Inbody
 	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
-	Helper functions for writing Match-3.
+	Helper functions for writing mario.
 ]]
 
 --[[
@@ -39,8 +39,6 @@ function GeneratePoleTiles(atlas,tilewidth,tileheight)
 	local sheetWidth = 96 / tilewidth
 	local sheetCounter = 1
 	local spriteSheet = {}
-	--local tilewidth = 16
-	--local tileheight = 48
 	for y = 0, sheetHeight - 1 do
 		for x = 0, sheetWidth - 1 do
 			spriteSheet[sheetCounter] = love.graphics.newQuad(x*tilewidth, y*tileheight,

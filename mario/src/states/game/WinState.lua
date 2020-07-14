@@ -2,7 +2,11 @@
 	GD50
 	Super Mario Bros. Remake
 
+	Author: Macarthur Inbody
+	133794m3r@gmail.com
+
 	-- WinState Class --
+	This state is what's shown when the player completes the level.
 ]]
 
 WinState = Class{__includes = BaseState}
@@ -25,7 +29,6 @@ function WinState:enter(params)
 end
 
 function WinState:update(dt)
-	--self.lives:update(dt)
 	Timer.update(dt)
 	if love.keyboard.wasPressed('space') or love.keyboard.wasPressed('t') then
 		print('cl',self.cur_level)

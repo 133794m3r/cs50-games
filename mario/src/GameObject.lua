@@ -2,8 +2,8 @@
 	GD50
 	-- Super Mario Bros. Remake --
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 ]]
 
 GameObject = Class{}
@@ -33,7 +33,6 @@ function GameObject:update(dt)
 end
 
 function GameObject:render()
-	--print_r(self)
 	love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y)
 end
 

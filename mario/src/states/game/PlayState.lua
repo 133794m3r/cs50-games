@@ -3,6 +3,8 @@
 	Super Mario Bros. Remake
 
 	-- PlayState Class --
+	Author: Macarthur Inbody
+	133794m3r@gmail.com
 ]]
 
 PlayState = Class{__includes = BaseState}
@@ -22,7 +24,6 @@ function PlayState:init()
 	self.pole_spawned = false
 	self.can_input = true
 	self.new_level = false
-	--self.new_level = false
 	self.player= Player({
 		x = 0, y = 0,
 		width = 16, height = 20,
@@ -35,7 +36,6 @@ function PlayState:init()
 		},
 		map = self.tileMap,
 		level = self.level,
---		key = false
 		key = true
 	})
 	self.lives = PlayerLives(self.player,'green-alien','green-alien-heads')
@@ -209,7 +209,7 @@ function PlayState:spawnEnemies()
 			if not groundFound then
 				if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
 					-- If we are near the player we won't let this continue on anymore.
-					-- random chance, 1 in 20
+					-- random chance, 1 in ceil(20 - cur_level /2). So basically every 2 levels the range goes down by 1.
 					groundFound = true
 					if math.random(enemyChance ) == 1 then
 						-- instantiate snail, declaring in advance so we can pass it into state machine

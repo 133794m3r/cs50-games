@@ -4,8 +4,8 @@
 
 	-- SnailIdleState Class --
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 ]]
 
 SnailIdleState = Class{__includes = BaseState}

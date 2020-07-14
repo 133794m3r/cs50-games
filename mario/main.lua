@@ -2,8 +2,8 @@
 	GD50
 	Super Mario Bros. Remake
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
 	A classic platformer in the style of Super Mario Bros., using a free
 	art pack. Super Mario Bros. was instrumental in the resurgence of video
@@ -75,7 +75,7 @@ function love.update(dt)
 end
 
 function love.draw()
-
+	-- uncomment to set FPS to 60.
 	--local cur_time = love.timer.getTime()
 	--if NEXT_TIME <= cur_time then
 	--	NEXT_TIME = cur_time

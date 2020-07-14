@@ -5,10 +5,8 @@
 	Authors: Macarthur Inbody
 	133794m3r@gmail.com
 
-	-- Dependencies --
-
-	A file to organize all of the global dependencies for our project, as
-	well as the assets for our game, rather than pollute our main.lua file.
+	-- PlayerCoins Class --
+	This class is what renders the player's coin count to the screen with an animated coin that's shown.
 ]]
 PlayerCoins = Class{}
 
@@ -36,14 +34,12 @@ function PlayerCoins:render(x,y)
 	else
 		y = y ~= nil and y or  5
 	end
-	--love.graphics.draw(gTextures['green-alien'],gFrames['green-alien-heads'][1],55,3,0,1,1)
 	love.graphics.setFont(gFonts['small'])
 	love.setColor(0, 0, 0, 255)
 	love.graphics.print(tostring(self.player.coins), x-1, y)
 	love.setColor(255, 255, 255, 255)
 	love.graphics.print(tostring(self.player.coins), x-2, y-1)
 
-	--love.graphics.setFont(gFonts['medium'])
 	love.setColor(0,0,0,255)
 	love.graphics.print('x',x-5,y)
 	love.setColor(255,255,255,255)
