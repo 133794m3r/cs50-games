@@ -38,7 +38,7 @@ function Player:findGround(def,direction)
 	local start_y=0
 	local end_y=160
 	local increment = TILE_SIZE
-
+	printf('direction:%s\n',direction)
 	if direction == nil then
 		start_x = 0
 		end_x = 1600
@@ -47,7 +47,11 @@ function Player:findGround(def,direction)
 		start_x = x
 		end_x = 0
 		increment = -TILE_SIZE
-	elseif dirction == 'right' then
+	elseif direction == 'right' then
+		start_x = x
+		end_x = 1600
+		increment = TILE_SIZE
+	else
 		start_x = x
 		end_x = 1600
 		increment = TILE_SIZE

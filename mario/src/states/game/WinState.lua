@@ -22,15 +22,10 @@ function WinState:enter(params)
 	self.player.y = y
 	self.player.StateDate = nil
 	self.backgroundX = 0
-	print('background',self.background)
-	for i=1,9 do
-		print(i)
-		print_r(gFrames['backgrounds2'][i])
-	end
 end
 
 function WinState:update(dt)
-	self.lives:update(dt)
+	--self.lives:update(dt)
 	Timer.update(dt)
 	if love.keyboard.wasPressed('space') or love.keyboard.wasPressed('t') then
 		print('cl',self.cur_level)
@@ -48,17 +43,15 @@ function WinState:update(dt)
 	end
 end
 function WinState:render()
-	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX), 0)
-	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX),
-			gTextures['backgrounds2']:getHeight() / 9 * 2, 0, 1, -1)
-	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX + 256), 0)
-	love.graphics.draw(gTextures['backgrounds2'], gFrames['backgrounds2'][self.background], math.floor(-self.backgroundX + 256),
-			gTextures['backgrounds2']:getHeight() / 9 * 2, 0, 1, -1)
 
-	love.graphics.setFont(gFonts['medium'])
-	love.setColor(0, 0, 0, 255)
-	love.graphics.print("Level "..tostring(self.cur_level)..' Start', 35, 25)
+	love.graphics.setFont(gFonts['large'])
 	love.setColor(255, 255, 255, 255)
-	love.graphics.print("Level "..tostring(self.cur_level)..' Start', 34, 24)
-
+	-- render the current level they're on message text.
+	love.graphics.printf("Level "..tostring(self.cur_level)..' Start', 0, 12,VIRTUAL_WIDTH,'center')
+	--reset font size to medium.
+	love.graphics.setFont(gFonts['medium'])
+	-- render score
+	love.graphics.printf('Score: '..tostring(self.player.score), 0, (VIRTUAL_HEIGHT/2)-15,VIRTUAL_WIDTH,'center')
+	self.lives:render((VIRTUAL_WIDTH / 2) + 2,(VIRTUAL_HEIGHT / 2) + 10  )
+	self.coins:render((VIRTUAL_WIDTH/2) - 1, (VIRTUAL_HEIGHT / 2) + 25 )
 end

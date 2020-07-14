@@ -34,7 +34,7 @@ function PlayerJumpState:update(dt)
 		a second. So that it plays as it did for him.
 	]]
 	if self.cur_time >= self.frame then
-		self.player.dy = self.player.dy + self.gravity + 0.44
+		self.player.dy = self.player.dy + self.gravity + 0.42
 		self.cur_time = 0
 		self.player.y = self.player.y + (self.player.dy * self.frame)
 	end
@@ -69,7 +69,14 @@ function PlayerJumpState:update(dt)
 	-- check if we've collided with any collidable game objects
 	for k, object in pairs(self.player.level.objects) do
 		if object:collides(self.player) then
-			if object.solid then
+			if object.consumable and object.collidable and object.solid then
+				if object.onCollide(object,self.player) then
+					table.remove(self.player.level.objects,k)
+				end
+				self.player.y = object.y + object.height
+				self.player.dy = 0
+				self.player:changeState('falling')
+			elseif object.solid then
 				object.onCollide(object,self.player)
 				self.player.y = object.y + object.height
 				self.player.dy = 0

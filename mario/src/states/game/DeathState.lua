@@ -53,8 +53,6 @@ function DeathState:render()
 	love.setColor(255, 255, 255, 255)
 	love.graphics.print("Level: ", 34, 24)
 
-	love.setColor(0,0,0,255)
-	love.graphics.print(tostring(self.level),85,25)
 	love.setColor(255, 255, 255, 255)
 	love.graphics.print(tostring(self.cur_level),84,24)
 	self.lives:render(VIRTUAL_WIDTH / 2 + 2,VIRTUAL_HEIGHT / 2 + 2)

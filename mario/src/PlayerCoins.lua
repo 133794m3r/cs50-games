@@ -29,20 +29,26 @@ function PlayerCoins:update(dt)
 	self.animation:update(dt)
 end
 
-function PlayerCoins:render()
+function PlayerCoins:render(x,y)
+	if x == nil then
+		x = 115
+		y = 5
+	else
+		y = y ~= nil and y or  5
+	end
 	--love.graphics.draw(gTextures['green-alien'],gFrames['green-alien-heads'][1],55,3,0,1,1)
 	love.graphics.setFont(gFonts['small'])
 	love.setColor(0, 0, 0, 255)
-	love.graphics.print(tostring(self.player.coins), 115, 5)
+	love.graphics.print(tostring(self.player.coins), x-1, y)
 	love.setColor(255, 255, 255, 255)
-	love.graphics.print(tostring(self.player.coins), 114, 4)
+	love.graphics.print(tostring(self.player.coins), x-2, y-1)
 
 	--love.graphics.setFont(gFonts['medium'])
 	love.setColor(0,0,0,255)
-	love.graphics.print('x',110,5)
+	love.graphics.print('x',x-5,y)
 	love.setColor(255,255,255,255)
-	love.graphics.print('x',109,4)
+	love.graphics.print('x',x-6,y-1)
 	love.graphics.draw(gTextures[self.atlas],
 			gFrames[self.texture][self.currentAnimation:getCurrentFrame()],
-			100, 10, 0, self.direction == 1 and 1 or -1, 1, 8, 10)
+			x-14, y+5, 0, self.direction == 1 and 1 or -1, 1, 8, 10)
 end

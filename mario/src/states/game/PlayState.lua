@@ -35,11 +35,12 @@ function PlayState:init()
 		},
 		map = self.tileMap,
 		level = self.level,
-		key = false
+--		key = false
+		key = true
 	})
 	self.lives = PlayerLives(self.player,'green-alien','green-alien-heads')
 	self.coins = PlayerCoins(self.player,'coins_and_bombs','coins_and_bombs')
-	self.key_color = nil
+	self.key_color = 1
 	self.player.stateData = self
 	self.player:changeState('falling')
 end
