@@ -36,6 +36,15 @@ function Entity:init(def)
     self.flashTimer = 0
 
     self.dead = false
+
+    --[[ So that any object can hold an item and then throw it. Just incase.
+        We set the pointer to nil to start off with. Then when they pickup an object it is then attached to them. here.
+        This will replace the "swing-sword" state for the player when they press space or whatever it is. Also this will
+        allow for other entities to also maybe throw items if they need to. This will be used for projectile attacks.
+        As they will be "thrown" to keep the game logic simple.
+    ]]
+    self.heldItem = nil
+
 end
 
 function Entity:createAnimations(animations)
@@ -105,11 +114,11 @@ function Entity:render(adjacentOffsetX, adjacentOffsetY)
     -- draw sprite slightly transparent if invulnerable every 0.04 seconds
     if self.invulnerable and self.flashTimer > 0.06 then
         self.flashTimer = 0
-        love.graphics.setColor(255, 255, 255, 64)
+        love.love.setColor(255, 255, 255, 64)
     end
 
     self.x, self.y = self.x + (adjacentOffsetX or 0), self.y + (adjacentOffsetY or 0)
     self.stateMachine:render()
-    love.graphics.setColor(255, 255, 255, 255)
+    love.love.setColor(255, 255, 255, 255)
     self.x, self.y = self.x - (adjacentOffsetX or 0), self.y - (adjacentOffsetY or 0)
 end

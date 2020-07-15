@@ -18,6 +18,8 @@ require 'src/Player'
 require 'src/StateMachine'
 require 'src/Util'
 
+-- all of my common utility functions I've written thus far.
+require 'src/misc'
 require 'src/world/Doorway'
 require 'src/world/Dungeon'
 require 'src/world/Room'
@@ -65,9 +67,13 @@ gFonts = {
 }
 
 gSounds = {
-    ['music'] = love.audio.newSource('sounds/music.mp3'),
-    ['sword'] = love.audio.newSource('sounds/sword.wav'),
-    ['hit-enemy'] = love.audio.newSource('sounds/hit_enemy.wav'),
-    ['hit-player'] = love.audio.newSource('sounds/hit_player.wav'),
-    ['door'] = love.audio.newSource('sounds/door.wav')
+    --[[for love 11 we have to say what type of source they are whether it's a stream or static.
+        a static stream is one that has the whole file decoded and stored into memory. Whereas a stream only loads a buffer
+        and the stream should be used if the file size is very large and it's an mp3 or an ogg file that is many MBs in size.
+    ]]
+    ['music'] = love.audio.newSource('sounds/music.mp3','static'),
+    ['sword'] = love.audio.newSource('sounds/sword.wav','static'),
+    ['hit-enemy'] = love.audio.newSource('sounds/hit_enemy.wav','static'),
+    ['hit-player'] = love.audio.newSource('sounds/hit_player.wav','static'),
+    ['door'] = love.audio.newSource('sounds/door.wav','static')
 }
