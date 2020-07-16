@@ -44,4 +44,8 @@ function GameObject:render(adjacentOffsetX, adjacentOffsetY)
 			gFrames[self.texture][self.states[self.state].frame
 					or self.frame],
 		self.x + adjacentOffsetX, self.y + adjacentOffsetY)
+	-- debug for player and hurtbox collision rects
+	love.setColor(255, 0, 255, 255)
+	 love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
+	 love.setColor(255, 255, 255, 255)
 end

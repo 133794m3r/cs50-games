@@ -22,6 +22,7 @@ function Room:init(player)
 	-- game objects in the room
 	self.objects = {}
 	self:generateObjects()
+	print('inited')
 
 	-- doorways that lead to other dungeon rooms
 	self.doorways = {}
@@ -81,11 +82,11 @@ end
 ]]
 function Room:generateObjects()
 	table.insert(self.objects, GameObject(
-		GAME_OBJECT_DEFS['switch'],
-		math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
-				VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
-		math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
-				VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+			GAME_OBJECT_DEFS['switch'],
+			math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
+					VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
+			math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
+					VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
 	))
 
 	-- get a reference to the switch
@@ -94,14 +95,14 @@ function Room:generateObjects()
 	-- define a function for the switch that will open all doors in the room
 	switch.onCollide = function()
 		if switch.state == 'unpressed' then
-		  switch.state = 'pressed'
+			switch.state = 'pressed'
 
-		  -- open every door in the room if we press the switch
-		  for k, doorway in pairs(self.doorways) do
-			 doorway.open = true
-		  end
+			-- open every door in the room if we press the switch
+			for k, doorway in pairs(self.doorways) do
+				doorway.open = true
+			end
 
-		  gSounds['door']:play()
+			gSounds['door']:play()
 		end
 	end
 	local pot = GAME_OBJECT_DEFS['pot']
@@ -111,15 +112,55 @@ function Room:generateObjects()
 	--print_r(pot)
 	pot.states['broke']={frame = pot.broke_frames[math.random(#pot.broke_frames)]}
 	pot.onCollide = function(self,player,dt)
-
-		if player.direction == 'left' then
-			player.x = player.x + PLAYER_WALK_SPEED * dt
-		end
-
+		--if player.direction == 'left' then
+		--	player.x = player.x + PLAYER_WALK_SPEED * dt
+		--elseif player.direction == 'right' then
+		--	player.x = player.x - PLAYER_WALK_SPEED * dt
+		--elseif player.direction == 'up' then
+		--	player.y = player.y + PLAYER_WALK_SPEED * dt
+		--elseif player.direction == 'down' then
+		--	player.y = player.y - PLAYER_WALK_SPEED * dt
+		--end
+		--print_r(player)
+		--print('pot collide')
+		--print(player.x,player.y)
+		--print(self.x,self.y)
 	end
-	table.insert(self.objects,GameObject(pot,math.random(MAP_RENDER_OFFSET_X+TILE_SIZE,VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
-			math.random(MAP_RENDER_OFFSET_Y+TILE_SIZE,
-					VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)))
+	local x = math.random(MAP_RENDER_OFFSET_X+TILE_SIZE,VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
+	local y = math.random(MAP_RENDER_OFFSET_Y+TILE_SIZE,VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE)+MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+	local minX = MAP_RENDER_OFFSET_X+TILE_SIZE,VIRTUAL_WIDTH - TILE_SIZE * 2 - 16
+	local maxX = VIRTUAL_WIDTH - TILE_SIZE * 2 - 16
+	local minY = MAP_RENDER_OFFSET_Y+TILE_SIZE
+	local maxY = VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE)+MAP_RENDER_OFFSET_Y - TILE_SIZE - 16
+	local X = 0
+	local Y = 0
+	local entityBlocked = true
+	local broke = false
+	local entityY = 0
+	local entityHeight = 0
+	while entityBlocked do
+		X = math.random(minX,maxX)
+		Y = math.random(minY,maxY)
+		broke = false
+		for _,entity in pairs(self.entities) do
+			entityY = entity.y + entity.height / 2
+			entityHeight = entity.height - entity.height / 2
+			-- top side
+			if (entity.y+entity.height == Y) and (entity.x >= X and entity.x+entity.width <= X+16) or
+				-- left side
+			(entity.y >= Y and entity.y <= Y+16) and (entity.x+entity.width >= X) or
+				-- right side
+			(entity.y >= Y and entity.y <= Y+16) and (entity.x >= X+16) or
+				-- bottom side
+			(entity.y == Y + 16) and (entity.x >= X and entity.x+entity.width <= X+16) then
+				entityBlocked = true
+			else
+				entityBlocked = false
+			end
+		end
+	end
+	table.insert(self.objects,GameObject(pot,X,Y))
+
 	--print_r(self.objects[2])
 end
 
@@ -181,32 +222,49 @@ function Room:update(dt)
 		end
 
 		-- collision between the player and entities in the room
-		if not entity.dead and self.player:collides(entity) and not self.player.invulnerable then
-		  gSounds['hit-player']:play()
-		  self.player:damage(1)
-		  self.player:goInvulnerable(1.5)
+		if not entity.dead then
+			if self.player:collides(entity) and not self.player.invulnerable then
+				gSounds['hit-player']:play()
+				self.player:damage(1)
+				self.player:goInvulnerable(1.5)
 
-		  if self.player.health == 0 then
-			 gStateMachine:change('game-over')
-		  end
+				if self.player.health == 0 then
+					gStateMachine:change('game-over')
+				end
+			else
+				for _,object in pairs(self.objects) do
+					if entity:collides(object) and object.solid then
+						-- top side
+						if (entity.y+entity.height == object.y) and (entity.x >= object.x and entity.x+entity.width <= object.x+object.width) then
+							entity.y = entity.y - entity.walkSpeed * dt
+						-- left side
+						elseif (entity.y >= object.y and entity.y <= object.y+object.height) and (entity.x+entity.width >= object.x) then
+							entity.x = entity.x - entity.walkSpeed * dt
+						-- right side
+						elseif	(entity.y >= object.y and entity.y <= object.y+object.height) and (entity.x >= object.x+object.width) then
+							entity.x = entity.x + entity.walkSpeed * dt
+						-- bottom side
+						elseif (entity.y == object.y + object.height) and (entity.x >= object.x and entity.x+entity.width <= object.x+object.width) then
+							entity.y = entity.y + entity.walkSpeed * dt
+						end
+						Event.dispatch('bumped',entity,dt)
+						--entity.bumped = true
+							break
+					end
+				end
+			end
 		end
 	end
 
 	for k, object in pairs(self.objects) do
 		object:update(dt)
-
-		-- trigger collision callback on object
-		--if object.type == 'pot' then
-		--	print(self.player:collides(object))
-		--end
+		-- check for collision for players and objects.
 		if self.player:collides(object) then
-			if object.type == 'pot' then
-				--print('pot hit')
-				--print_r(self.player)
-				--print('end pot')
+			if object.solid then
+				Event.dispatch('bumped',self.player,dt)
+				break
 			end
 			object:onCollide(self.player,dt)
---			print(self.player.bumped)
 		end
 	end
 end

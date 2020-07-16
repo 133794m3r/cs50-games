@@ -64,13 +64,29 @@ end
 function EntityWalkState:processAI(params, dt)
 	local room = params.room
 	local directions = {'left', 'right', 'up', 'down'}
-
+	local opposites = {
+		['left']='right',
+		['right']='left',
+		['up']='down',
+		['down']='up'
+	}
 	if self.moveDuration == 0 or self.bumped then
-
+		self.entity.bumped = false
 		-- set an initial move duration and direction
 		self.moveDuration = math.random(5)
 		self.entity.direction = directions[math.random(#directions)]
+--		print(self.entity.direction)
 		self.entity:changeAnimation('walk-' .. tostring(self.entity.direction))
+	elseif self.entity.bumped == true then
+		print('bumped')
+		print(self.entity.direction)
+		self.entity.direction = opposites[self.entity.direction]
+		self.entity:changeAnimation('walk-'..self.entity.direction)
+		self.entity:update(dt)
+		self.entity:changeState('idle')
+		print(self.entity.direction)
+		print()
+		self.entity.bumped = false
 	elseif self.movementTimer > self.moveDuration then
 		self.movementTimer = 0
 

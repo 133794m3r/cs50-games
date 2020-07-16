@@ -36,7 +36,18 @@ print(LOVE_VERSION_11)
 printf = function(s,...)
 	return io.write(s:format(...))
 end
-
+Event.on('bumped',function(entity,dt)
+	entity.bumped = true
+	if entity.direction == 'left' then
+		entity.x = entity.x + entity.walkSpeed * dt
+	elseif entity.direction == 'right' then
+		entity.x = entity.x - entity.walkSpeed * dt
+	elseif entity.direction == 'up' then
+		entity.y = entity.y + entity.walkSpeed * dt
+	elseif entity.direction == 'down' then
+		entity.y = entity.y - entity.walkSpeed * dt
+	end
+end)
 function deepcopy(orig, copies)
 	copies = copies or {}
 	local orig_type = type(orig)

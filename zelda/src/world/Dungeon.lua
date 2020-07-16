@@ -41,18 +41,6 @@ function Dungeon:init(player)
 	Event.on('shift-down', function()
 		self:beginShifting(0, VIRTUAL_HEIGHT)
 	end)
-	-- When the player has bumped into something
-	Event.on('bumped',function(entity)
-		if entity.direction == 'left' then
-
-		elseif entity.direction == 'right' then
-
-		elseif entity.direction == 'up' then
-
-		elseif entity.direction == 'down' then
-
-		end
-	end)
 end
 
 --[[
