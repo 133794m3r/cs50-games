@@ -21,33 +21,51 @@ function Level:init()
     -- one for different stages of any given collision
     function beginContact(a, b, coll)
         local types = {}
-        types[a:getUserData()] = true
-        types[b:getUserData()] = true
+        local health = 0
 
+        local data_a = a:getUserData()
+        local data_b = b:getUserData()
+        types[data_a.type] = true
+        types[data_b.type] = true
+        print_r(types)
         -- if we collided between both an alien and an obstacle...
         if types['Obstacle'] and types['Player'] then
 
+            self.launchMarker.hasCollided = true
             -- destroy the obstacle if player's combined velocity is high enough
-            if a:getUserData() == 'Obstacle' then
+            if data_a.type == 'Obstacle' then
+                health = data_a.health
                 local velX, velY = b:getBody():getLinearVelocity()
                 local sumVel = math.abs(velX) + math.abs(velY)
 
                 if sumVel > 20 then
-                    table.insert(self.destroyedBodies, a:getBody())
+                    health = health -1
+                    print(health)
+                    a:setUserData({type='Obstacle',health = health})
+                    print_r(a:getUserData())
+                    if health <= 0 then
+                        table.insert(self.destroyedBodies, a:getBody())
+                    end
                 end
             else
+                health = data_b.health
                 local velX, velY = a:getBody():getLinearVelocity()
                 local sumVel = math.abs(velX) + math.abs(velY)
 
                 if sumVel > 20 then
-                    table.insert(self.destroyedBodies, b:getBody())
+                    health = health -1
+                    print(health)
+                    b:setUserData({type='Obstacle',health = health})
+                    print_r(b:getUserData())
+                    if health <= 0 then
+                        table.insert(self.destroyedBodies, b:getBody())
+                    end
                 end
             end
         end
 
         -- if we collided between an obstacle and an alien, as by debris falling...
         if types['Obstacle'] and types['Alien'] then
-
             -- destroy the alien if falling debris is falling fast enough
             if a:getUserData() == 'Obstacle' then
                 local velX, velY = a:getBody():getLinearVelocity()
@@ -68,6 +86,7 @@ function Level:init()
 
         -- if we collided between the player and the alien...
         if types['Player'] and types['Alien'] then
+            self.launchMarker.hasCollided = true
 
             -- destroy the alien if player is traveling fast enough
             if a:getUserData() == 'Player' then
@@ -123,25 +142,69 @@ function Level:init()
     -- simple edge shape to represent collision for ground
     self.edgeShape = love.physics.newEdgeShape(0, 0, VIRTUAL_WIDTH * 3, 0)
 
-    -- spawn an alien to try and destroy
-    table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
-
-    -- spawn a few obstacles
-    table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-        VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
-    table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-        VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
-    table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-        VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+    self:generate()
 
     -- ground data
     self.groundBody = love.physics.newBody(self.world, -VIRTUAL_WIDTH, VIRTUAL_HEIGHT - 35, 'static')
     self.groundFixture = love.physics.newFixture(self.groundBody, self.edgeShape)
     self.groundFixture:setFriction(0.5)
-    self.groundFixture:setUserData('Ground')
+    self.groundFixture:setUserData({type = 'Ground'})
 
     -- background graphics
     self.background = Background()
+end
+
+function Level:generate()
+
+    local level = math.random(2)
+    if level == 1 then
+        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 90, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
+        -- spawn a few obstacles
+        --[[ Makes a level like this
+           ___
+         || . ||
+            _______
+         |||| . ||||
+
+         Where || is a vertical block. ___ is a horizontal block. and . is an alien.
+        ]]
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+                VIRTUAL_WIDTH - 135, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+                VIRTUAL_WIDTH - 175, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 205, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+                VIRTUAL_WIDTH - 50, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+                VIRTUAL_WIDTH-10, VIRTUAL_HEIGHT - 35 - 110 / 2))
+
+
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+                VIRTUAL_WIDTH - 145, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+                VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 95, VIRTUAL_HEIGHT - TILE_SIZE - 145 - ALIEN_SIZE / 2, 'Alien'))
+
+        table.insert(self.obstacles,Obstacle(self.world, 'horizontal',
+                VIRTUAL_WIDTH - 175, VIRTUAL_HEIGHT - 180 - 35 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+                VIRTUAL_WIDTH - 20, VIRTUAL_HEIGHT - 180 - 35 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+            VIRTUAL_WIDTH - 90, VIRTUAL_HEIGHT - 35 - 180 - 35 / 2))
+    else
+        -- spawn an alien to try and destroy
+        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
+
+        -- spawn a few obstacles
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+                VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+                VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+                VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+
+    end
 end
 
 function Level:update(dt)
@@ -173,6 +236,9 @@ function Level:update(dt)
         end
     end
 
+    for _,obstacle in pairs(self.obstacles) do
+        obstacle:update()
+    end
     -- remove all destroyed aliens from level
     for i = #self.aliens, 1, -1 do
         if self.aliens[i].body:isDestroyed() then
@@ -184,19 +250,44 @@ function Level:update(dt)
 
     -- replace launch marker if original alien stopped moving
     if self.launchMarker.launched then
-        local xPos, yPos = self.launchMarker.alien.body:getPosition()
-        local xVel, yVel = self.launchMarker.alien.body:getLinearVelocity()
-        
-        -- if we fired our alien to the left or it's almost done rolling, respawn
-        if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 1.5) then
-            self.launchMarker.alien.body:destroy()
-            self.launchMarker = AlienLaunchMarker(self.world)
+        local xPos,yPos = 0,0
+        local xVel,yVel = 0,0
+        if not self.launchMarker.hasSplit then
+            xPos,yPos = self.launchMarker.alien.body:getPosition()
+            xVel, yVel = self.launchMarker.alien.body:getLinearVelocity()
+            if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 1.5) then
+                self.launchMarker.alien.body:destroy()
+                self.launchMarker = AlienLaunchMarker(self.world)
+                -- re-initialize level if we have no more aliens
+                if #self.aliens == 0 then
+                    gStateMachine:change('start')
+                end
+            end
+            if love.keyboard.wasPressed('space') and not self.launchMarker.hasCollided then
+                self.launchMarker:split()
+            end
+        else
 
-            -- re-initialize level if we have no more aliens
-            if #self.aliens == 0 then
-                gStateMachine:change('start')
+            for i,alien in pairs(self.launchMarker.alien) do
+                xPos,yPos = alien.body:getPosition()
+                xVel, yVel = alien.body:getLinearVelocity()
+
+                if xPos < 0 or (math.abs(xVel)+math.abs(yVel) < 1.5) then
+                    alien.body:destroy()
+                    table.remove(self.launchMarker.alien,i)
+                end
+            end
+
+            if #self.launchMarker.alien == 0 then
+                self.launchMarker.alien = nil
+                self.launchMarker = AlienLaunchMarker(self.world)
+
+                if #self.aliens == 0 then
+                    gStateMachine:change('start')
+                end
             end
         end
+
     end
 end
 
@@ -219,17 +310,17 @@ function Level:render()
     -- render instruction text if we haven't launched bird
     if not self.launchMarker.launched then
         love.graphics.setFont(gFonts['medium'])
-        love.setColor0, 0, 0, 255)
+        love.setColor(0, 0, 0, 255)
         love.graphics.printf('Click and drag circular alien to shoot!',
             0, 64, VIRTUAL_WIDTH, 'center')
-        love.setColor255, 255, 255, 255)
+        love.setColor(255, 255, 255, 255)
     end
 
     -- render victory text if all aliens are dead
     if #self.aliens == 0 then
         love.graphics.setFont(gFonts['huge'])
-        love.setColor0, 0, 0, 255)
+        love.setColor(0, 0, 0, 255)
         love.graphics.printf('VICTORY', 0, VIRTUAL_HEIGHT / 2 - 32, VIRTUAL_WIDTH, 'center')
-        love.setColor255, 255, 255, 255)
+        love.setColor(255, 255, 255, 255)
     end
 end

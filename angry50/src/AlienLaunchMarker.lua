@@ -30,6 +30,12 @@ function AlienLaunchMarker:init(world)
 
     -- our alien we will eventually spawn
     self.alien = nil
+
+    -- if they've collided with anything..
+    self.hasCollided = false
+
+    -- if they've split
+    self.hasSplit = false
 end
 
 function AlienLaunchMarker:update(dt)
@@ -39,12 +45,12 @@ function AlienLaunchMarker:update(dt)
 
         -- grab mouse coordinates
         local x, y = push:toGame(love.mouse.getPosition())
-        
+
         -- if we click the mouse and haven't launched, show arrow preview
         if love.mouse.wasPressed(1) and not self.launched then
             self.aiming = true
 
-        -- if we release the mouse, launch an Alien
+            -- if we release the mouse, launch an Alien
         elseif love.mouse.wasReleased(1) and self.aiming then
             self.launched = true
 
@@ -60,8 +66,7 @@ function AlienLaunchMarker:update(dt)
 
             -- we're no longer aiming
             self.aiming = false
-
-        -- re-render trajectory
+            -- re-render trajectory
         elseif self.aiming then
             self.rotation = self.baseY - self.shiftedY * 0.9
             self.shiftedX = math.min(self.baseX + 30, math.max(x, self.baseX - 30))
@@ -106,6 +111,46 @@ function AlienLaunchMarker:render()
         
         love.setColor(255, 255, 255, 255)
     else
-        self.alien:render()
+        if self.hasSplit then
+            for _,alien in pairs(self.alien) do
+                alien:render()
+            end
+        else
+            self.alien:render()
+        end
     end
+end
+
+function AlienLaunchMarker:split()
+
+    local x = self.alien.body:getX()
+    local y = self.alien.body:getY()
+    local velX, velY = self.alien.body:getLinearVelocity()
+    local original_alien = Alien(self.world,'round',x,y,'Player')
+    -- move it by the center of the sphere of the alien.
+    local bottom_alien = Alien(self.world,'round',x,y + 17.5, 'Player')
+    -- move it down by teh center of the sphere of the alien.
+    local top_alien = Alien(self.world, 'round', x, y - 17.5, 'Player')
+    local velX2 = velX /10
+    local velY2 = velY / 10
+    top_alien.body:setLinearVelocity(velX-velX2,velY-velY2)
+    top_alien.fixture:setRestitution(0.4)
+    top_alien.body:setAngularDamping(1)
+
+    original_alien.body:setLinearVelocity(velX, velY)
+    original_alien.fixture:setRestitution(0.4)
+    original_alien.body:setAngularDamping(1)
+
+    bottom_alien.body:setLinearVelocity(velX+(-velX2),velY+(-velY2))
+    bottom_alien.fixture:setRestitution(0.4)
+    bottom_alien.body:setAngularDamping(1)
+
+    print('alien has split')
+
+    self.hasSplit = true
+    self.alien.body:destroy()
+    self.alien = {}
+    table.insert(self.alien,top_alien)
+    table.insert(self.alien,bottom_alien)
+    table.insert(self.alien,original_alien)
 end

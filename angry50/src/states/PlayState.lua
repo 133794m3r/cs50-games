@@ -11,6 +11,7 @@ PlayState = Class{__includes = BaseState}
 function PlayState:init()
     self.level = Level()
     self.levelTranslateX = 0
+    self.paused = false
 end
 
 function PlayState:update(dt)
@@ -38,14 +39,16 @@ function PlayState:update(dt)
             self.level.background:update(dt)
         end
     end
+    if not self.paused then
+        self.level:update(dt)
 
-    self.level:update(dt)
+    end
 end
 
 function PlayState:render()
-    love.setColor255, 255, 255, 255)
+    love.setColor(255, 255, 255, 255)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()))
-    love.setColor255, 255, 255, 255)
+    love.setColor(255, 255, 255, 255)
 
     -- render background separate from level rendering
     self.level.background:render()

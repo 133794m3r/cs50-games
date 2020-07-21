@@ -26,7 +26,7 @@ require 'src/Dependencies'
 
 function love.load()
     math.randomseed(os.time())
-    love.graphics.setDefaultFilter('nearest', 'nearest')
+    love.graphics.setDefaultFilter('nearest','nearest',2)
     love.window.setTitle('Angry 50')
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {

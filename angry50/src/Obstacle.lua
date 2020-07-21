@@ -43,11 +43,19 @@ function Obstacle:init(world, shape, x, y)
 
     self.fixture = love.physics.newFixture(self.body, self.shape)
 
-    self.fixture:setUserData('Obstacle')
+    self.fixture:setUserData({
+        type = 'Obstacle',
+        health = 2
+    })
 end
 
 function Obstacle:update(dt)
-
+    --print_r(self.fixture:getUserData())
+    if self.fixture:getUserData().health == 1 then
+        if self.frame == 2 or self.frame == 4 then
+            self.frame = self.frame - 1
+        end
+    end
 end
 
 function Obstacle:render()

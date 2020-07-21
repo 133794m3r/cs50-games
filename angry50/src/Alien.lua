@@ -13,7 +13,7 @@ function Alien:init(world, type, x, y, userData)
 
     self.world = world
     self.type = type or 'square'
-
+    self.hasCollided = false
     self.body = love.physics.newBody(self.world, 
         x or math.random(VIRTUAL_WIDTH), y or math.random(VIRTUAL_HEIGHT - 35),
         'dynamic')
@@ -29,7 +29,9 @@ function Alien:init(world, type, x, y, userData)
 
     self.fixture = love.physics.newFixture(self.body, self.shape)
 
-    self.fixture:setUserData(userData)
+    self.fixture:setUserData({
+        type = userData
+    })
 
     -- used to keep track of despawning the Alien and flinging it
     self.launched = false
