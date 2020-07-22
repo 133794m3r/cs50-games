@@ -24,7 +24,7 @@ function Obstacle:init(world, shape, x, y)
 
     self.startX = x
     self.startY = y
-
+    local health = health or 1
     self.world = world
 
     self.body = love.physics.newBody(self.world, 

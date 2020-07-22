@@ -27,7 +27,7 @@ function Level:init()
         local data_b = b:getUserData()
         types[data_a.type] = true
         types[data_b.type] = true
-        print_r(types)
+
         -- if we collided between both an alien and an obstacle...
         if types['Obstacle'] and types['Player'] then
 
@@ -40,7 +40,6 @@ function Level:init()
 
                 if sumVel > 20 then
                     health = health -1
-                    print(health)
                     a:setUserData({type='Obstacle',health = health})
                     print_r(a:getUserData())
                     if health <= 0 then
@@ -54,7 +53,6 @@ function Level:init()
 
                 if sumVel > 20 then
                     health = health -1
-                    print(health)
                     b:setUserData({type='Obstacle',health = health})
                     print_r(b:getUserData())
                     if health <= 0 then
@@ -155,9 +153,12 @@ function Level:init()
 end
 
 function Level:generate()
-
+    -- which of my designed levels to show.
     local level = math.random(2)
+    -- what level of health the blocks will have. has a 25% chance of having 2 health aka 2 hits to destory.
+    local health = math.random(4) == 1 and 2 or 1
     if level == 1 then
+
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 90, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
         -- spawn a few obstacles
         --[[ Makes a level like this
@@ -169,40 +170,40 @@ function Level:generate()
          Where || is a vertical block. ___ is a horizontal block. and . is an alien.
         ]]
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-                VIRTUAL_WIDTH - 135, VIRTUAL_HEIGHT - 35 - 110 / 2))
+                VIRTUAL_WIDTH - 135, VIRTUAL_HEIGHT - 35 - 110 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-                VIRTUAL_WIDTH - 175, VIRTUAL_HEIGHT - 35 - 110 / 2))
+                VIRTUAL_WIDTH - 175, VIRTUAL_HEIGHT - 35 - 110 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 205, VIRTUAL_HEIGHT - 35 - 110 / 2))
+            VIRTUAL_WIDTH - 205, VIRTUAL_HEIGHT - 35 - 110 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-                VIRTUAL_WIDTH - 50, VIRTUAL_HEIGHT - 35 - 110 / 2))
+                VIRTUAL_WIDTH - 50, VIRTUAL_HEIGHT - 35 - 110 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-                VIRTUAL_WIDTH-10, VIRTUAL_HEIGHT - 35 - 110 / 2))
+                VIRTUAL_WIDTH-10, VIRTUAL_HEIGHT - 35 - 110 / 2,health))
 
 
         table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-                VIRTUAL_WIDTH - 145, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+                VIRTUAL_WIDTH - 145, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-                VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+                VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2,health))
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 95, VIRTUAL_HEIGHT - TILE_SIZE - 145 - ALIEN_SIZE / 2, 'Alien'))
 
         table.insert(self.obstacles,Obstacle(self.world, 'horizontal',
-                VIRTUAL_WIDTH - 175, VIRTUAL_HEIGHT - 180 - 35 / 2))
+                VIRTUAL_WIDTH - 175, VIRTUAL_HEIGHT - 180 - 35 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-                VIRTUAL_WIDTH - 20, VIRTUAL_HEIGHT - 180 - 35 / 2))
+                VIRTUAL_WIDTH - 20, VIRTUAL_HEIGHT - 180 - 35 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-            VIRTUAL_WIDTH - 90, VIRTUAL_HEIGHT - 35 - 180 - 35 / 2))
+            VIRTUAL_WIDTH - 90, VIRTUAL_HEIGHT - 35 - 180 - 35 / 2,health))
     else
         -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
 
         -- spawn a few obstacles
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-                VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
+                VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-                VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
+                VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2,health))
         table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-                VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+                VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2,health))
 
     end
 end
