@@ -41,7 +41,6 @@ function Level:init()
                 if sumVel > 20 then
                     health = health -1
                     a:setUserData({type='Obstacle',health = health})
-                    print_r(a:getUserData())
                     if health <= 0 then
                         table.insert(self.destroyedBodies, a:getBody())
                     end
@@ -54,7 +53,6 @@ function Level:init()
                 if sumVel > 20 then
                     health = health -1
                     b:setUserData({type='Obstacle',health = health})
-                    print_r(b:getUserData())
                     if health <= 0 then
                         table.insert(self.destroyedBodies, b:getBody())
                     end
@@ -106,6 +104,7 @@ function Level:init()
 
         -- if we hit the ground, play a bounce sound
         if types['Player'] and types['Ground'] then
+            self.launchMarker.hasCollided = true        
             gSounds['bounce']:stop()
             gSounds['bounce']:play()
         end
