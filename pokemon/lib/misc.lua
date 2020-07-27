@@ -31,8 +31,8 @@ function love.setColor(red,green,blue,alpha)
         end
     end
 end
+
 LOVE_VERSION_11 = love.getVersion()
-print(LOVE_VERSION_11)
 printf = function(s,...)
     return io.write(s:format(...))
 end

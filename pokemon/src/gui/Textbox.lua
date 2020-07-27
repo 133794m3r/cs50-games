@@ -8,7 +8,7 @@
 
 Textbox = Class{}
 
-function Textbox:init(x, y, width, height, text, font)
+function Textbox:init(x, y, width, height, text, font,maxLines)
     self.panel = Panel(x, y, width, height)
     self.x = x
     self.y = y
@@ -18,11 +18,10 @@ function Textbox:init(x, y, width, height, text, font)
     self.text = text
     self.font = font or gFonts['small']
     _, self.textChunks = self.font:getWrap(self.text, self.width - 12)
-
+    self.maxLines = (maxLines or 3) -1
     self.chunkCounter = 1
     self.endOfText = false
     self.closed = false
-
     self:next()
 end
 
@@ -32,7 +31,7 @@ end
 function Textbox:nextChunks()
     local chunks = {}
 
-    for i = self.chunkCounter, self.chunkCounter + 2 do
+    for i = self.chunkCounter, self.chunkCounter + self.maxLines do
         table.insert(chunks, self.textChunks[i])
 
         -- if we've reached the number of total chunks, we can return
@@ -42,7 +41,7 @@ function Textbox:nextChunks()
         end
     end
 
-    self.chunkCounter = self.chunkCounter + 3
+    self.chunkCounter = self.chunkCounter + self.maxLines + 1
 
     return chunks
 end

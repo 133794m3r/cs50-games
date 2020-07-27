@@ -8,7 +8,7 @@
 
 Pokemon = Class{}
 
-function Pokemon:init(def, level)
+function Pokemon:init(def, level,player)
     self.name = def.name
 
     self.battleSpriteFront = def.battleSpriteFront
@@ -18,11 +18,12 @@ function Pokemon:init(def, level)
     self.baseAttack = def.baseAttack
     self.baseDefense = def.baseDefense
     self.baseSpeed = def.baseSpeed
-
     self.HPIV = def.HPIV
     self.attackIV = def.attackIV
     self.defenseIV = def.defenseIV
     self.speedIV = def.speedIV
+
+
 
     self.HP = self.baseHP
     self.attack = self.baseAttack
@@ -32,16 +33,27 @@ function Pokemon:init(def, level)
     self.level = level
     self.currentExp = 0
     self.expToLevel = self.level * self.level * 5 * 0.75
-
-    self:calculateStats()
+    self:calculateStats(player)
 
     self.currentHP = self.HP
 end
 
-function Pokemon:calculateStats()
+function Pokemon:calculateStats(player)
+    local HPIncrease, attackIncrease, defenseIncrease, speedIncrease
     for i = 1, self.level do
-        self:statsLevelUp()
+        HPIncrease, attackIncrease, defenseIncrease, speedIncrease =self:statsLevelUp()
+        -- to make sure that the player's Pokemon is stronger than wild ones we make sure that it always gets 1 extra
+        -- stat during each of it's "levelups" during it's initial state. So its total stats will always be higher than wild
+        -- ones at the same level 5.
+        if player then
+            self.HP = self.HP + (HPIncrease == 0 and 1 or 0)
+            self.attack = self.attack + (attackIncrease == 0 and 1 or 0)
+            self.defense = self.defense + (defenseIncrease == 0 and 1 or 0)
+            self.speed = self.speed + (speedIncrease == 0 and 1 or 0)
+        end
+
     end
+
 end
 
 function Pokemon.getRandomDef()
