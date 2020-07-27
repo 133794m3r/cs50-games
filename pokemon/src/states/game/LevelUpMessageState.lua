@@ -1,4 +1,10 @@
+--[[
+    GD50
+    Pokemon
 
+    Author: Macarthur Inbody
+   	133794m3r@gmail.com
+]]
 
 LevelUpMessageState = Class{__includes = BaseState}
 

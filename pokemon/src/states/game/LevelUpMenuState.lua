@@ -1,4 +1,12 @@
 --[[
+    GD50
+    Pokemon
+
+    Author: Macarthur Inbody
+   	133794m3r@gmail.com
+]]
+
+--[[
 Because the assignment wants a freaking menu? Why in the hell. This makes _zero_ sense. 
 I got it working  with a textbox which is all this needs but screw it. I'll waste time redowing it as a menu.
 Yeah no I'm not dealing with a freaking menu it makes _zero_ sense to make it as part of a menu as it's just a textbox.
