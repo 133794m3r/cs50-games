@@ -2,8 +2,8 @@
 	GD50
 	-- Super Mario Bros. Remake --
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 ]]
 
 GameObject = Class{}
@@ -33,7 +33,6 @@ function GameObject:update(dt)
 end
 
 function GameObject:render()
-	--print_r(self)
 	love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y)
 end
 
@@ -106,8 +105,8 @@ function FlagObject:init(def)
 	self.onConsume = def.onConsume
 	self.hit = def.hit
 	self.animation = Animation{
-		frames = {def.frame,def.frame + 1},
-		interval = 0.6
+		frames = {def.frame,def.frame + 1,def.frame+1,def.frame,def.frame+1,def.frame+1},
+		interval = 0.45
 	}
 	self.flag_animation = self.animation
 end

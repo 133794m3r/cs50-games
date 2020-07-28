@@ -2,8 +2,8 @@
 	GD50
 	Super Mario Bros. Remake
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
 	A classic platformer in the style of Super Mario Bros., using a free
 	art pack. Super Mario Bros. was instrumental in the resurgence of video
@@ -36,7 +36,9 @@ function love.load()
 
 	gStateMachine = StateMachine {
 		['start'] = function() return StartState() end,
-		['play'] = function() return PlayState() end
+		['play'] = function() return PlayState() end,
+		['death'] = function() return DeathState() end,
+		['win'] = function() return WinState() end
 	}
 	gStateMachine:change('start')
 
@@ -63,7 +65,7 @@ function love.keyboard.wasPressed(key)
 	return love.keyboard.keysPressed[key]
 end
 MIN_FRAME = 1/60
---CUR_TIME = 0
+CUR_TIME = 0
 NEXT_TIME = love.timer.getTime()
 function love.update(dt)
 	NEXT_TIME = NEXT_TIME + MIN_FRAME
@@ -73,8 +75,8 @@ function love.update(dt)
 end
 
 function love.draw()
-
-	local cur_time = love.timer.getTime()
+	-- uncomment to set FPS to 60.
+	--local cur_time = love.timer.getTime()
 	--if NEXT_TIME <= cur_time then
 	--	NEXT_TIME = cur_time
 	--	return
@@ -82,7 +84,7 @@ function love.draw()
 	--love.timer.sleep(NEXT_TIME - cur_time)
 	push:start()
 	gStateMachine:render()
-	fps_counter()
+	--fps_counter()
 	push:finish()
 end
 function fps_counter()

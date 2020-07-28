@@ -34,11 +34,11 @@ function PlayerJumpState:update(dt)
 		a second. So that it plays as it did for him.
 	]]
 	if self.cur_time >= self.frame then
-		self.player.dy = self.player.dy + self.gravity
+		self.player.dy = self.player.dy + self.gravity + 0.42
 		self.cur_time = 0
+		self.player.y = self.player.y + (self.player.dy * self.frame)
 	end
-	self.player.y = self.player.y + (self.player.dy * dt)
-
+	--self.player.y = self.player.y + (self.player.dy * dt)
 	-- go into the falling state when y velocity is positive
 	if self.player.dy >= 0 then
 		self.player:changeState('falling')
@@ -69,13 +69,20 @@ function PlayerJumpState:update(dt)
 	-- check if we've collided with any collidable game objects
 	for k, object in pairs(self.player.level.objects) do
 		if object:collides(self.player) then
-			if object.solid then
+			if object.consumable and object.collidable and object.solid then
+				if object.onCollide(object,self.player) then
+					table.remove(self.player.level.objects,k)
+				end
+				self.player.y = object.y + object.height
+				self.player.dy = 0
+				self.player:changeState('falling')
+			elseif object.solid then
 				object.onCollide(object,self.player)
 				self.player.y = object.y + object.height
 				self.player.dy = 0
 				self.player:changeState('falling')
 			elseif object.consumable then
-				object.onConsume(self.player)
+				object.onConsume(self.player,object)
 				table.remove(self.player.level.objects, k)
 			elseif object.collidable then
 				object:onCollide(object,self.player)
@@ -86,8 +93,7 @@ function PlayerJumpState:update(dt)
 	-- check if we've collided with any entities and die if so
 	for k, entity in pairs(self.player.level.entities) do
 		if entity:collides(self.player) then
-			--gSounds['death']:play()
-			--gStateMachine:change('start')
+			self.player:lifeLost()
 		end
 	end
 end

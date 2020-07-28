@@ -4,13 +4,14 @@
 
 	-- Snail Class --
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 ]]
 
 Snail = Class{__includes = Entity}
 
 function Snail:init(def)
+	self.variety = def.variety
 	Entity.init(self, def)
 end
 

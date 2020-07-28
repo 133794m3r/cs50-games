@@ -4,8 +4,8 @@
 
 	-- SnailMovingState Class --
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 ]]
 
 SnailMovingState = Class{__includes = BaseState}
@@ -14,8 +14,9 @@ function SnailMovingState:init(tilemap, player, snail)
 	self.tilemap = tilemap
 	self.player = player
 	self.snail = snail
+	local frame = snail.variety == 1 and 49 or 53
 	self.animation = Animation {
-		frames = {49, 50},
+		frames = {frame, frame+1},
 		interval = 0.5
 	}
 	self.snail.currentAnimation = self.animation

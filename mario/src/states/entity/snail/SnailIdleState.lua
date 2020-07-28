@@ -4,8 +4,8 @@
 
 	-- SnailIdleState Class --
 
-	Author: Colton Ogden
-	cogden@cs50.harvard.edu
+	Authors: Colton Ogden, Macarthur Inbody
+	cogden@cs50.harvard.edu, 133794m3r@gmail.com
 ]]
 
 SnailIdleState = Class{__includes = BaseState}
@@ -15,6 +15,7 @@ function SnailIdleState:init(tilemap, player, snail)
 	self.player = player
 	self.snail = snail
 	self.waitTimer = 0
+	local frame = snail.variety == 1 and 51 or 55
 	self.animation = Animation {
 		frames = {51},
 		interval = 1
