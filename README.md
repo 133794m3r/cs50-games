@@ -1,6 +1,3 @@
-# 133794m3r
-CS50g assignments.
-
 Each assignment's folder has a readme with the video URL, and also what features they contain.
 
 ## Pong
