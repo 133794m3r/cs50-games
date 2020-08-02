@@ -4,8 +4,8 @@
 
     -- ServeState Class --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Authors: Colton Ogden, Macarthur Inbody
+    cogden@cs50.harvard.edu, 133794m3r@gmail.com
 
     The state in which we are waiting to serve the ball; here, we are
     basically just moving the paddle left and right with the ball until we
