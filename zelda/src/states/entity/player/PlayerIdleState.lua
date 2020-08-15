@@ -23,7 +23,9 @@ function PlayerIdleState:update(dt)
 	  love.keyboard.isDown('up') or love.keyboard.isDown('down') then
 		self.entity:changeState('walk')
 	end
-
+	if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+		self.entity:changeState('lift')
+	end
 	if love.keyboard.wasPressed('space') then
 		self.entity:changeState('swing-sword')
 	end

@@ -23,40 +23,37 @@ function EntityWalkState:init(entity, dungeon)
 end
 
 function EntityWalkState:update(dt)
+	local map_h = MAP_HEIGHT * TILE_SIZE
+	local map_w = MAP_WIDTH * TILE_SIZE
 
 	-- assume we didn't hit a wall
 	self.bumped = false
-
 	if self.entity.direction == 'left' then
-		self.entity.x = self.entity.x - self.entity.walkSpeed * dt
 
+		self.entity.x = self.entity.x - self.entity.walkSpeed * dt
 		if self.entity.x <= MAP_RENDER_OFFSET_X + TILE_SIZE then
-		  self.entity.x = MAP_RENDER_OFFSET_X + TILE_SIZE
 		  self.bumped = true
 		end
+
 	elseif self.entity.direction == 'right' then
 		self.entity.x = self.entity.x + self.entity.walkSpeed * dt
-
 		if self.entity.x + self.entity.width >= VIRTUAL_WIDTH - TILE_SIZE * 2 then
-		  self.entity.x = VIRTUAL_WIDTH - TILE_SIZE * 2 - self.entity.width
+		  self.entity.x = (VIRTUAL_WIDTH - TILE_SIZE * 2) - self.entity.width
 		  self.bumped = true
 		end
 	elseif self.entity.direction == 'up' then
 		self.entity.y = self.entity.y - self.entity.walkSpeed * dt
-
 		if self.entity.y <= MAP_RENDER_OFFSET_Y + TILE_SIZE - self.entity.height / 2 then
 		  self.entity.y = MAP_RENDER_OFFSET_Y + TILE_SIZE - self.entity.height / 2
 		  self.bumped = true
 		end
 	elseif self.entity.direction == 'down' then
 		self.entity.y = self.entity.y + self.entity.walkSpeed * dt
-
 		local bottomEdge = VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE)
 		  + MAP_RENDER_OFFSET_Y - TILE_SIZE
-
-		if self.entity.y + self.entity.height >= bottomEdge then
-		  self.entity.y = bottomEdge - self.entity.height
-		  self.bumped = true
+		if self.entity.y+self.entity.height >= bottomEdge then
+			self.entity.y = bottomEdge - self.entity.height
+			self.bumped = true
 		end
 	end
 end
@@ -75,17 +72,13 @@ function EntityWalkState:processAI(params, dt)
 		-- set an initial move duration and direction
 		self.moveDuration = math.random(5)
 		self.entity.direction = directions[math.random(#directions)]
---		print(self.entity.direction)
 		self.entity:changeAnimation('walk-' .. tostring(self.entity.direction))
+		--self.entity:changeState('idle')
 	elseif self.entity.bumped == true then
-		print('bumped')
-		print(self.entity.direction)
 		self.entity.direction = opposites[self.entity.direction]
 		self.entity:changeAnimation('walk-'..self.entity.direction)
-		self.entity:update(dt)
+		--self.entity:update(dt)
 		self.entity:changeState('idle')
-		print(self.entity.direction)
-		print()
 		self.entity.bumped = false
 	elseif self.movementTimer > self.moveDuration then
 		self.movementTimer = 0

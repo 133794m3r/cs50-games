@@ -70,7 +70,6 @@ function Dungeon:beginShifting(shiftX, shiftY)
 	else
 		playerY = -VIRTUAL_HEIGHT + MAP_RENDER_OFFSET_Y + (MAP_HEIGHT * TILE_SIZE) - TILE_SIZE - self.player.height
 	end
-
 	-- tween the camera in whichever direction the new room is in, as well as the player to be
 	-- at the opposite door in the next room, walking through the wall (which is stenciled)
 	Timer.tween(1, {
@@ -78,7 +77,6 @@ function Dungeon:beginShifting(shiftX, shiftY)
 		[self.player] = {x = playerX, y = playerY}
 	}):finish(function()
 		self:finishShifting()
-
 		-- reset player to the correct location in the room
 		if shiftX < 0 then
 		  self.player.x = MAP_RENDER_OFFSET_X + (MAP_WIDTH * TILE_SIZE) - TILE_SIZE - self.player.width
@@ -112,9 +110,19 @@ function Dungeon:finishShifting()
 	self.cameraY = 0
 	self.shifting = false
 	self.currentRoom = self.nextRoom
-	self.nextRoom = nil
 	self.currentRoom.adjacentOffsetX = 0
 	self.currentRoom.adjacentOffsetY = 0
+	self.nextRoom = nil
+	-- Because somehow after moving some entities will be moved into no where's ville.
+	for i,entity in pairs(self.currentRoom.entities) do
+		if entity.x < 0 or entity.x > VIRTUAL_WIDTH then
+			self.currentRoom.entities[i].x = MAP_RENDER_OFFSET_X + TILE_SIZE
+		end
+		if entity.y < 0 or entity.y > VIRTUAL_HEIGHT then
+			self.currentRoom.entities[i].y = ( VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE)
+					+ MAP_RENDER_OFFSET_Y - TILE_SIZE) - entity.height
+		end
+	end
 end
 
 function Dungeon:update(dt)

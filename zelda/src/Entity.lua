@@ -79,7 +79,7 @@ function Entity:goInvulnerable(duration)
 end
 
 function Entity:changeState(name)
-	self.stateMachine:change(name)
+	self.stateMachine:change(name,self)
 end
 
 function Entity:changeAnimation(name)
@@ -120,10 +120,10 @@ function Entity:render(adjacentOffsetX, adjacentOffsetY)
 	self.x, self.y = self.x + (adjacentOffsetX or 0), self.y + (adjacentOffsetY or 0)
 	self.stateMachine:render()
 	love.setColor(255, 255, 255, 255)
-	self.x, self.y = self.x - (adjacentOffsetX or 0), self.y - (adjacentOffsetY or 0)
+	--self.x, self.y = self.x - (adjacentOffsetX or 0), self.y - (adjacentOffsetY or 0)
 
-
-	love.setColor(255, 255, 0, 255)
-	love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
-	love.setColor(255, 255, 255, 255)
+	--show the hitbox.
+	--love.setColor(255, 255, 0, 255)
+	--love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
+	--love.setColor(255, 255, 255, 255)
 end

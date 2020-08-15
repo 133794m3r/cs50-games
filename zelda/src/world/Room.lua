@@ -12,6 +12,7 @@ function Room:init(player)
 	self.width = MAP_WIDTH
 	self.height = MAP_HEIGHT
 
+
 	self.tiles = {}
 	self:generateWallsAndFloors()
 
@@ -22,8 +23,9 @@ function Room:init(player)
 	-- game objects in the room
 	self.objects = {}
 	self:generateObjects()
-	print('inited')
 
+	self.projectiles = {}
+	--self:generateProjectiles()
 	-- doorways that lead to other dungeon rooms
 	self.doorways = {}
 	table.insert(self.doorways, Doorway('top', false, self))
@@ -48,25 +50,26 @@ end
 ]]
 function Room:generateEntities()
 	local types = {'skeleton', 'slime', 'bat', 'ghost', 'spider'}
+	local x,y = 0,0
 
 	for i = 1, 10 do
 		local type = types[math.random(#types)]
-
 		table.insert(self.entities, Entity {
 		  animations = ENTITY_DEFS[type].animations,
 		  walkSpeed = ENTITY_DEFS[type].walkSpeed or 20,
 
 		  -- ensure X and Y are within bounds of the map
 		  x = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
-			 VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
+			 VIRTUAL_WIDTH - (TILE_SIZE * 2) - 40),
 		  y = math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
-			 VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16),
+			 VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 40),
 
 		  width = 16,
 		  height = 16,
 
 		  health = 1
 		})
+		--print('i',i,'x,y',self.entities[i].x,self.entities[i].y)
 
 		self.entities[i].stateMachine = StateMachine {
 		  ['walk'] = function() return EntityWalkState(self.entities[i]) end,
@@ -106,62 +109,68 @@ function Room:generateObjects()
 		end
 	end
 	local pot = GAME_OBJECT_DEFS['pot']
-	pot.frame = pot.normal_frames[math.random(#pot.normal_frames)]
+	local potFrame = math.random(#pot.normal_frames)
+	pot.frame = pot.normal_frames[potFrame]
 	pot.states['normal'] = {frame = pot.frame}
-	--print(pot.frame)
-	--print_r(pot)
-	pot.states['broke']={frame = pot.broke_frames[math.random(#pot.broke_frames)]}
-	pot.onCollide = function(self,player,dt)
-		--if player.direction == 'left' then
-		--	player.x = player.x + PLAYER_WALK_SPEED * dt
-		--elseif player.direction == 'right' then
-		--	player.x = player.x - PLAYER_WALK_SPEED * dt
-		--elseif player.direction == 'up' then
-		--	player.y = player.y + PLAYER_WALK_SPEED * dt
-		--elseif player.direction == 'down' then
-		--	player.y = player.y - PLAYER_WALK_SPEED * dt
-		--end
-		--print_r(player)
-		--print('pot collide')
-		--print(player.x,player.y)
-		--print(self.x,self.y)
-	end
+	pot.states['broke'] = {frame = pot.broke_frames[potFrame]}
+	pot.onCollide = function(self,player,dt) end
+	local potFrame = math.random(#pot.normal_frames)
 	local x = math.random(MAP_RENDER_OFFSET_X+TILE_SIZE,VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
 	local y = math.random(MAP_RENDER_OFFSET_Y+TILE_SIZE,VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE)+MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
 	local minX = MAP_RENDER_OFFSET_X+TILE_SIZE,VIRTUAL_WIDTH - TILE_SIZE * 2 - 16
 	local maxX = VIRTUAL_WIDTH - TILE_SIZE * 2 - 16
 	local minY = MAP_RENDER_OFFSET_Y+TILE_SIZE
-	local maxY = VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE)+MAP_RENDER_OFFSET_Y - TILE_SIZE - 16
+	local maxY = VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE)+MAP_RENDER_OFFSET_Y - TILE_SIZE*2
 	local X = 0
 	local Y = 0
 	local entityBlocked = true
 	local broke = false
 	local entityY = 0
 	local entityHeight = 0
-	while entityBlocked do
-		X = math.random(minX,maxX)
-		Y = math.random(minY,maxY)
-		broke = false
-		for _,entity in pairs(self.entities) do
-			entityY = entity.y + entity.height / 2
-			entityHeight = entity.height - entity.height / 2
-			-- top side
-			if (entity.y+entity.height == Y) and (entity.x >= X and entity.x+entity.width <= X+16) or
-				-- left side
-			(entity.y >= Y and entity.y <= Y+16) and (entity.x+entity.width >= X) or
-				-- right side
-			(entity.y >= Y and entity.y <= Y+16) and (entity.x >= X+16) or
-				-- bottom side
-			(entity.y == Y + 16) and (entity.x >= X and entity.x+entity.width <= X+16) then
-				entityBlocked = true
-			else
-				entityBlocked = false
+	local selfY, selfHeight = Y + 8, 4
+	local potHitbox = {
+		['height'] = 16,
+		['width'] = 16,
+		['x'] = 0,
+		['y'] = 0
+	}
+	local num_pots = math.random(4)
+	--local num_pots = 10
+--	num_pots = 10
+	for i=1,num_pots do
+		X = 0
+		Y = 0
+		entityBlocked = true
+		while entityBlocked do
+			X = math.random(minX,maxX)
+			Y = math.random(minY,maxY)
+			broke = false
+			entityBlocked = false
+			potHitbox.x,potHitbox.y = X,Y
+			for _,entity in pairs(self.entities) do
+				entityY = entity.y + entity.height / 2
+				entityHeight = entity.height - entity.height / 2
+				if entity:collides(potHitbox) or
+					((entity.x-2 < X and entity.x+entity.width+2 > X) and ( entity.y-2 < Y and entity.y + entity.height+2 > Y) )
+				then
+					entityBlocked = true
+				else
+					entityBlocked = false
+				end
+			end
+			selfY, selfHeight = Y + 8, 4
+			for __,object in pairs(self.objects) do
+				if object:collides(potHitbox) or
+					((object.x-2 < X and object.x+object.width+2 > X) and ( object.y-2 < Y and object.y + object.height+2 > Y) )
+				then
+					entityBlocked = true
+				else
+					entityBlocked = false
+				end
 			end
 		end
-	end
 	table.insert(self.objects,GameObject(pot,X,Y))
-
-	--print_r(self.objects[2])
+	end
 end
 
 --[[
@@ -205,20 +214,23 @@ function Room:generateWallsAndFloors()
 end
 
 function Room:update(dt)
+
 	-- don't update anything if we are sliding to another room (we have offsets)
 	if self.adjacentOffsetX ~= 0 or self.adjacentOffsetY ~= 0 then return end
-
 	self.player:update(dt)
-
+	--local remove_entities = {}
 	for i = #self.entities, 1, -1 do
 		local entity = self.entities[i]
 
 		-- remove entity from the table if health is <= 0
 		if entity.health <= 0 then
-		  entity.dead = true
+			if math.random(10) == 1 and not entity.dead then
+				self:spawnHeart(entity)
+			end
+			entity.dead = true
 		elseif not entity.dead then
-		  entity:processAI({room = self}, dt)
-		  entity:update(dt)
+			entity:processAI({room = self}, dt)
+			entity:update(dt)
 		end
 
 		-- collision between the player and entities in the room
@@ -232,24 +244,26 @@ function Room:update(dt)
 					gStateMachine:change('game-over')
 				end
 			else
-				for _,object in pairs(self.objects) do
-					if entity:collides(object) and object.solid then
-						-- top side
-						if (entity.y+entity.height == object.y) and (entity.x >= object.x and entity.x+entity.width <= object.x+object.width) then
-							entity.y = entity.y - entity.walkSpeed * dt
-						-- left side
-						elseif (entity.y >= object.y and entity.y <= object.y+object.height) and (entity.x+entity.width >= object.x) then
-							entity.x = entity.x - entity.walkSpeed * dt
-						-- right side
-						elseif	(entity.y >= object.y and entity.y <= object.y+object.height) and (entity.x >= object.x+object.width) then
-							entity.x = entity.x + entity.walkSpeed * dt
-						-- bottom side
-						elseif (entity.y == object.y + object.height) and (entity.x >= object.x and entity.x+entity.width <= object.x+object.width) then
-							entity.y = entity.y + entity.walkSpeed * dt
-						end
-						Event.dispatch('bumped',entity,dt)
-						--entity.bumped = true
+				if entity.bumped == false then
+					for _,object in pairs(self.objects) do
+						if entity:collides(object) and object.solid then
+							-- top side
+							if (entity.y+entity.height == object.y) and (entity.x >= object.x and entity.x+entity.width <= object.x+object.width) then
+								entity.y = entity.y - entity.walkSpeed * dt
+								-- left side
+							elseif (entity.y >= object.y and entity.y <= object.y+object.height) and (entity.x+entity.width >= object.x) then
+								entity.x = entity.x - entity.walkSpeed * dt
+								-- right side
+							elseif	(entity.y >= object.y and entity.y <= object.y+object.height) and (entity.x >= object.x+object.width) then
+								entity.x = entity.x + entity.walkSpeed * dt
+								-- bottom side
+							elseif (entity.y == object.y + object.height) and (entity.x >= object.x and entity.x+entity.width <= object.x+object.width) then
+								entity.y = entity.y + entity.walkSpeed * dt
+							end
+							Event.dispatch('bumped',entity,dt)
+							--entity.bumped = true
 							break
+						end
 					end
 				end
 			end
@@ -264,7 +278,28 @@ function Room:update(dt)
 				Event.dispatch('bumped',self.player,dt)
 				break
 			end
-			object:onCollide(self.player,dt)
+			if object.onCollide(object,self.player,dt) then
+				table.remove(self.objects,k)
+			end
+		end
+	end
+	for _,projectile in pairs(self.projectiles) do
+		projectile:update(dt)
+		if projectile.dy ~= 0  or projectile.dx ~= 0 then
+			if projectile:doneMoving() then
+				table.remove(self.projectiles,_)
+			elseif projectile:outOfBounds(self) then
+				table.remove(self.projectiles,_)
+			else
+				for __,entity in pairs(self.entities) do
+					if projectile:collides(entity) then
+						entity:damage(1)
+						table.remove(self.projectiles,_)
+						break;
+					end
+				end
+			end
+
 		end
 	end
 end
@@ -277,6 +312,7 @@ function Room:render()
 			 (x - 1) * TILE_SIZE + self.renderOffsetX + self.adjacentOffsetX,
 			 (y - 1) * TILE_SIZE + self.renderOffsetY + self.adjacentOffsetY)
 		end
+
 	end
 
 	-- render doorways; stencils are placed where the arches are after so the player can
@@ -292,6 +328,7 @@ function Room:render()
 	for k, entity in pairs(self.entities) do
 		if not entity.dead then entity:render(self.adjacentOffsetX, self.adjacentOffsetY) end
 	end
+
 
 	-- stencil out the door arches so it looks like the player is going through
 	love.graphics.stencil(function()
@@ -319,4 +356,19 @@ function Room:render()
 	end
 
 	love.graphics.setStencilTest()
+	for k, projectile in pairs(self.projectiles) do
+		projectile:render(self.adjacentOffsetX, self.adjacentOffsetY)
+	end
+end
+
+function Room:spawnHeart(entity)
+	local heart = GameObject(GAME_OBJECT_DEFS['heart'],entity.x,entity.y)
+	heart.onCollide = function(obj,player,dt)
+		if not obj.collided then
+			obj.collided = true
+			player:damage(-2)
+			return true
+		end
+	end
+	table.insert(self.objects,heart)
 end

@@ -23,7 +23,6 @@ function love.setColor(red,green,blue,alpha)
 		end
 	else
 		if type(red) == 'table' then
-		  print_r(red)
 		  love.graphics.setColor(red)
 		else
 		  love.graphics.setColor(red,green,blue,alpha)
@@ -32,7 +31,7 @@ function love.setColor(red,green,blue,alpha)
 	end
 end
 LOVE_VERSION_11 = love.getVersion()
-print(LOVE_VERSION_11)
+--print(LOVE_VERSION_11)
 printf = function(s,...)
 	return io.write(s:format(...))
 end

@@ -14,6 +14,7 @@ GAME_OBJECT_DEFS = {
 		width = 16,
 		height = 16,
 		solid = false,
+		canPickup = false,
 		defaultState = 'unpressed',
 		states = {
 			['unpressed'] = {
@@ -34,6 +35,7 @@ GAME_OBJECT_DEFS = {
 		frame = 14,
 		width = 16,
 		height = 16,
+		canPickup = true,
 		states={
 			['normal'] = {
 				frame = 14
@@ -42,5 +44,15 @@ GAME_OBJECT_DEFS = {
 				frame = 53
 			}
 		}
+	},
+	['heart'] = {
+		type = 'heart',
+		texture = 'hearts',
+		normal_frame = 5,
+		solid = false,
+		frame = 5,
+		width = 16,
+		height = 16,
+		canPickup = true
 	}
 }
